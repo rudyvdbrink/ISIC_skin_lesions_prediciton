@@ -167,3 +167,4 @@ data/
 #misc
 to_do.txt
 *.svg
+*.pkl
