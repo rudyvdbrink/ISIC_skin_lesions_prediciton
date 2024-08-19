@@ -38,11 +38,12 @@ model.compile(optimizer='adam',
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
 
+
 # %% plot the model
 
 font = ImageFont.truetype("arial.ttf", 32) 
-visualkeras.layered_view(model,legend=True,font=font, scale_xy=1, scale_z=0.1).show() # display using your system viewer
-visualkeras.layered_view(model,legend=True,font=font, scale_xy=1, scale_z=0.1, to_file='./figures/CNN.png') # write to disk
+visualkeras.layered_view(model,legend=True, legend_text_spacing_offset=20, font=font, scale_xy=1, scale_z=0.1).show() # display using your system viewer
+visualkeras.layered_view(model,legend=True, legend_text_spacing_offset=20, font=font, scale_xy=1, scale_z=0.1, to_file='./figures/CNN.png') # write to disk
 #visualkeras.layered_view(model, to_file='./figures/CNN.png').show() # write and show
 
 #visualkeras.layered_view(model)
