@@ -15,7 +15,7 @@ import visualkeras
 
 # %% load data
 
-with open('data/processed/mnist_data.pkl', 'rb') as f:
+with open('../data/processed/mnist_data.pkl', 'rb') as f:
     loaded_data = pickle.load(f)
 
 X_train            = loaded_data[0]

@@ -61,7 +61,7 @@ data_to_save = [X_train, X_test, y_train, y_test]
 
 print('Saving data...')
 # save data to file so we don't have to run it again
-with open('data/processed/mnist_data.pkl','wb') as f:
+with open('../data/processed/mnist_data.pkl','wb') as f:
     pickle.dump(data_to_save,f) 
 print('All done!')
 

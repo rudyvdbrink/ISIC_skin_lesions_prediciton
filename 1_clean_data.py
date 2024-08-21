@@ -35,7 +35,7 @@ target = metadata.pop('diagnosis')
 labels = dict(enumerate(pd.factorize(target)[1]))
 target = pd.factorize(target)[0]
 
-# %% group target into only two classes
+# %% group target into only two classes to make the problem a binary classifiation
 
 # {0: 'nevus',
 #  1: 'melanoma',
@@ -45,10 +45,13 @@ target = pd.factorize(target)[0]
 #  5: 'basal cell carcinoma',
 #  6: 'vascular lesion',
 #  7: 'actinic keratosis'}
-# 0: [0, 2, 3, 6]
-# 1: [1, 4, 5, 7]
+# 0: [0, 2, 3, 6] # Benign
+# 1: [1, 4, 5, 7] # (Pre-)Cancerous
 
 target = np.where(np.isin(target, [0, 2, 3, 6]), 0, 1)
+
+labels = ['Benign', '(Pre-)Cancerous']
+
 
 # %% train test split
 
