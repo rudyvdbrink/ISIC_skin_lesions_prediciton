@@ -39,8 +39,8 @@ def load_images(raw_images_dir):
 
 def load_and_sort_metadata(csv_path, file_names):
     # Load the metadata from the .csv file
-    #metadata = pd.read_csv(csv_path + 'ham10000_metadata_2024-08-16.csv')
-    metadata = pd.read_csv('./data/metadata/ham10000_metadata_2024-08-16.csv')
+    metadata = pd.read_csv(csv_path + 'ham10000_metadata_2024-08-16.csv')
+    #metadata = pd.read_csv('./data/metadata/ham10000_metadata_2024-08-16.csv')
 
     # Get the list of image file names (without the .jpg suffix)
     image_filenames = [filename.split('.')[0] for filename in file_names if filename.endswith('.jpg')]
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     # %% plot some images to make sure it went correctly
 
-    plot_images_grid(data,metadata,start_N=0)
+    #plot_images_grid(data,metadata,start_N=0)
     #plot_images_grid(data,start_N=0,num_images=4,grid_shape=(2,2))
 
     # %% save data to file

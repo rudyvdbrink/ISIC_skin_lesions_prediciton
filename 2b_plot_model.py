@@ -47,3 +47,4 @@ visualkeras.layered_view(model,legend=True, legend_text_spacing_offset=20, font=
 #visualkeras.layered_view(model, to_file='./figures/CNN.png').show() # write and show
 
 #visualkeras.layered_view(model)
+
