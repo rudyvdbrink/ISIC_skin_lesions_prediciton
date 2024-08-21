@@ -35,23 +35,6 @@ target = metadata.pop('diagnosis')
 labels = dict(enumerate(pd.factorize(target)[1]))
 target = pd.factorize(target)[0]
 
-# %% group target into only two classes to make the problem a binary classifiation
-
-# {0: 'nevus',
-#  1: 'melanoma',
-#  2: 'pigmented benign keratosis',
-#  3: 'dermatofibroma',
-#  4: 'squamous cell carcinoma',
-#  5: 'basal cell carcinoma',
-#  6: 'vascular lesion',
-#  7: 'actinic keratosis'}
-# 0: [0, 2, 3, 6] # Benign
-# 1: [1, 4, 5, 7] # (Pre-)Cancerous
-
-target = np.where(np.isin(target, [0, 2, 3, 6]), 0, 1)
-
-labels = ['Benign', '(Pre-)Cancerous']
-
 
 # %% train test split
 
@@ -60,40 +43,40 @@ X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.20
 
 # %% rebalance data (super-sample less frequent class)
 
-# Flatten the input data temporarily to use with RandomOverSampler
-X_train_flat = X_train.reshape((X_train.shape[0], -1))  # Reshape to (9376, 90000)
+# # Flatten the input data temporarily to use with RandomOverSampler
+# X_train_flat = X_train.reshape((X_train.shape[0], -1))  # Reshape to (9376, 90000)
 
 
-# Apply RandomOverSampler to balance the classes
-ros = RandomOverSampler(sampling_strategy='auto', random_state=42)
-X_train_resampled, y_train_resampled = ros.fit_resample(X_train_flat, y_train)
+# # Apply RandomOverSampler to balance the classes
+# ros = RandomOverSampler(sampling_strategy='auto', random_state=42)
+# X_train_resampled, y_train_resampled = ros.fit_resample(X_train_flat, y_train)
 
-# Reshape X_train back to the original shape
-X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2], 3))
+# # Reshape X_train back to the original shape
+# X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2], 3))
 
-# Verify the class distribution after resampling
-unique, counts = np.unique(y_train_resampled, return_counts=True)
-print(f'Class distribution after resampling: {dict(zip(unique, counts))}')
+# # Verify the class distribution after resampling
+# unique, counts = np.unique(y_train_resampled, return_counts=True)
+# print(f'Class distribution after resampling: {dict(zip(unique, counts))}')
 
-# %% sub-sample data to its original size
+# # %% sub-sample data to its original size
 
-# Sub-sample the resampled data to match the original size
-X_train_subsampled, y_train_subsampled = resample(
-    X_train_resampled, y_train_resampled, 
-    replace=False,  # Do not replace, we want exactly original size
-    n_samples=9376,  # Original size
-    random_state=42  # For reproducibility
-)
+# # Sub-sample the resampled data to match the original size
+# X_train_subsampled, y_train_subsampled = resample(
+#     X_train_resampled, y_train_resampled, 
+#     replace=False,  # Do not replace, we want exactly original size
+#     n_samples=9376,  # Original size
+#     random_state=42  # For reproducibility
+# )
 
-# Verify the shape
-print(f"Sub-sampled X_train shape: {X_train_subsampled.shape}")
-print(f"Sub-sampled y_train shape: {y_train_subsampled.shape}")
+# # Verify the shape
+# print(f"Sub-sampled X_train shape: {X_train_subsampled.shape}")
+# print(f"Sub-sampled y_train shape: {y_train_subsampled.shape}")
 
 
-# %% over-write original variables and save
+# # %% over-write original variables and save
 
-X_train = X_train_subsampled
-y_train = y_train_subsampled
+# X_train = X_train_subsampled
+# y_train = y_train_subsampled
 
 # %% save data
 
@@ -101,7 +84,7 @@ data_to_save = [X_train, X_test, y_train, y_test, labels, metadata]
 
 print('Saving data...')
 # save data to file so we don't have to run it again
-with open('data/processed/isic_data.pkl','wb') as f:
+with open('data/processed/isic_data_allclasses.pkl','wb') as f:
     pickle.dump(data_to_save,f) 
 print('All done!')
 

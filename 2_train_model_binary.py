@@ -20,7 +20,7 @@ import visualkeras
 
 # %% load data
 
-with open('data/processed/isic_data_allclasses.pkl', 'rb') as f:
+with open('data/processed/isic_data.pkl', 'rb') as f:
     loaded_data = pickle.load(f)
 
 X_train            = loaded_data[0]
@@ -154,7 +154,7 @@ plt.figure(figsize=(5, 4))
 sns.heatmap(conf_matrix, annot=True, cmap="inferno", xticklabels=labels, yticklabels=labels)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
-plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
+plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
 plt.show()
 
 # 4. Plot the ROC curves for each class
