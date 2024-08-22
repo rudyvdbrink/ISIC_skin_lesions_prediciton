@@ -9,12 +9,16 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_curve, 
 
 from sklearn import metrics
 import tensorflow as tf
+import keras
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
 from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.preprocessing.image import smart_resize
+from tensorflow.keras.applications import Xception
+
+from supporting_functions import plot_images_grid_nometa
 
 import visualkeras
 
@@ -30,26 +34,12 @@ y_test             = loaded_data[3]
 labels             = loaded_data[4]
 metadata           = loaded_data[5]
 
-#%% reshape input data
-
-#reshape X_train to the appropriate 4D shape (9376, 450, 600, 3)
-# X_train = X_train.reshape((9376, 450, 600, 3))
-# X_test  = X_test.reshape((2344, 450, 600, 3))
-
-# %% sub-sample
-
-# X_train = X_train[:,::3,::3,:]
-# X_test  = X_test[:,::3,::3,:]
-
 # %% smart re-sample images
 
-# X_train = smart_resize(X_train,(28, 28))
-# X_test  = smart_resize(X_test,(28, 28))
+X_train = smart_resize(X_train,(150, 150))
+X_test  = smart_resize(X_test,(150, 150))
 
-X_train = smart_resize(X_train,(56, 56))
-X_test  = smart_resize(X_test,(56, 56))
-
-#plot_images_grid_nometa(X_train)
+plot_images_grid_nometa(X_train)
 
 # %%
 
@@ -57,93 +47,62 @@ X_test  = smart_resize(X_test,(56, 56))
 num_classes = len(np.unique(y_train))
 y_train_encoded = to_categorical(y_train, num_classes)
 
+#  %% load a base model
 
-# %% set up model
+base_model = Xception(
+    weights='imagenet',  # Load weights pre-trained on ImageNet.
+    input_shape=(150, 150, 3),
+    include_top=False)  # Do not include the ImageNet classifier at the top.
 
-model = tf.keras.Sequential([
-    tf.keras.Input(shape=(np.shape(X_train)[1], np.shape(X_train)[2], np.shape(X_train)[3])),
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.Flatten(), #turn output of previous layer into a vector rather than tensor
-    tf.keras.layers.Dense(units=20,activation='relu'),
-    tf.keras.layers.Dense(units=num_classes, activation='softmax')
-])
+# %% freeze
 
-# %% info on model
+base_model.trainable = False
 
+# %% 
 
-model.summary()
+inputs = keras.Input(shape=(150, 150, 3))
+# We make sure that the base_model is running in inference mode here,
+# by passing `training=False`. This is important for fine-tuning, as you will
+# learn in a few paragraphs.
+x = base_model(inputs, training=False)
+# Convert features of shape `base_model.output_shape[1:]` to vectors
+x = keras.layers.GlobalAveragePooling2D()(x)
+# A Dense classifier with a single unit (binary classification)
+outputs = keras.layers.Dense(1)(x)
+model = keras.Model(inputs, outputs)
 
-#font = ImageFont.truetype("arial.ttf", 32) 
-visualkeras.layered_view(model,legend=True, scale_xy=1, scale_z=0.01)
+# %% train the model
 
+model.compile(optimizer=keras.optimizers.Adam(),
+              loss=keras.losses.BinaryCrossentropy(from_logits=True),
+              metrics=[keras.metrics.BinaryAccuracy()])
+model.fit(X_train, y_train, epochs=6)
 
-# %% image augmentation (we over-sampled )
+# %% model fine tuning
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+# # Unfreeze the base model
+# base_model.trainable = True
 
-# Create an ImageDataGenerator with random rotations and other augmentations
-datagen = ImageDataGenerator(
-    rotation_range=30,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=True,
-    fill_mode='nearest'
-)
-#fit the generator on data
-datagen.fit(X_train)
+# # It's important to recompile your model after you make any changes
+# # to the `trainable` attribute of any inner layer, so that your changes
+# # are take into account
+# model.compile(optimizer=keras.optimizers.Adam(1e-5),  # Very low learning rate
+#               loss=keras.losses.BinaryCrossentropy(from_logits=True),
+#               metrics=[keras.metrics.BinaryAccuracy()])
 
-# %% compile and fit
-
-#model.compile(optimizer='sgd',loss='categorical_crossentropy',metrics=['accuracy'])
-model.compile(optimizer='Adam',loss='categorical_crossentropy')
-
-# Train the model using the generator
-model.fit(datagen.flow(X_train, to_categorical(y_train, num_classes=num_classes), batch_size=32),
-          steps_per_epoch=len(X_train) // 32,
-          epochs=20,
-          )
-model.summary()
-
-# %%
+# # Train end-to-end. Be careful to stop before you overfit!
+# model.fit(X_train,y_train, epochs=10)
 
 
-# pred = model.predict(X_test)
-# pred = np.argmax(pred,axis=1)
-# print('Accuracy = ' + str(np.mean(pred==y_test)))
-# print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
+# %% make predictions
 
-# #plt.imshow(metrics.confusion_matrix(y_test,pred))
-# sns.heatmap(metrics.confusion_matrix(y_test,pred) / len(pred),linecolor='white',linewidths=0.05)
-# plt.xlabel("true label")
-# plt.ylabel("predicted label")
-# plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
-# plt.show()
-
-
-# %%
-
-# 1. Evaluate the model on the test data
-num_classes = len(np.unique(y_test))
-# test_loss, test_accuracy = model.evaluate(X_test, to_categorical(y_test, num_classes), verbose=0)
-# print(f'Test Loss: {test_loss:.4f}')
-# print(f'Test Accuracy: {test_accuracy:.4f}')
-
-# 2. Predict the class probabilities and class labels
 y_pred_proba = model.predict(X_test)
+y_pred_proba = np.concatenate((y_pred_proba*-1, y_pred_proba), axis=1)
 y_pred       = np.argmax(y_pred_proba, axis=1)
 
-# %% classification report
+# %% classification report and plots
 
 print(classification_report(y_pred,y_test,zero_division=0))
-
-# %% plots
 
 print('Accuracy = ' + str(np.mean(y_pred==y_test)))
 print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
@@ -154,7 +113,7 @@ plt.figure(figsize=(5, 4))
 sns.heatmap(conf_matrix, annot=True, cmap="inferno", xticklabels=labels, yticklabels=labels)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
-plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
+plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
 plt.show()
 
 # 4. Plot the ROC curves for each class
