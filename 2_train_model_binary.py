@@ -97,18 +97,19 @@ model.fit(datagen.flow(X_train, y_train, batch_size=32),
 
 # %% model fine tuning
 
-# # Unfreeze the base model
-# base_model.trainable = True
+# Unfreeze the base model
+base_model.trainable = True
 
-# # It's important to recompile your model after you make any changes
-# # to the `trainable` attribute of any inner layer, so that your changes
-# # are take into account
-# model.compile(optimizer=keras.optimizers.Adam(1e-5),  # Very low learning rate
-#               loss=keras.losses.BinaryCrossentropy(from_logits=True),
-#               metrics=[keras.metrics.BinaryAccuracy()])
+# It's important to recompile your model after you make any changes
+# to the `trainable` attribute of any inner layer, so that your changes
+# are take into account
+model.compile(optimizer=keras.optimizers.Adam(1e-5),  # Very low learning rate
+              loss=keras.losses.BinaryCrossentropy(from_logits=True),
+              metrics=[keras.metrics.BinaryAccuracy()])
 
-# # Train end-to-end. Be careful to stop before you overfit!
-# model.fit(X_train,y_train, epochs=10)
+# Train end-to-end. Be careful to stop before you overfit!
+model.fit(datagen.flow(X_train, y_train, batch_size=32),
+          epochs=2)
 
 
 # %% make predictions
@@ -127,7 +128,7 @@ print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred
 # 3. Plot the confusion matrix
 conf_matrix = confusion_matrix(y_test, y_pred,normalize='true')
 plt.figure(figsize=(5, 4))
-sns.heatmap(conf_matrix, annot=True, cmap="inferno", xticklabels=labels, yticklabels=labels)
+sns.heatmap(conf_matrix, annot=True, cmap="inferno", vmin=0, vmax=1, xticklabels=labels, yticklabels=labels)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
 plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
