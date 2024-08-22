@@ -20,6 +20,8 @@ from tensorflow.keras.applications import Xception
 
 from supporting_functions import plot_images_grid_nometa
 
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
 import visualkeras
 
 # %% load data
@@ -46,6 +48,20 @@ plot_images_grid_nometa(X_train)
 #one-hot encode the labels
 num_classes = len(np.unique(y_train))
 y_train_encoded = to_categorical(y_train, num_classes)
+
+# %% image augmentation (we over-sampled minority class)
+
+# Create an ImageDataGenerator with random rotations and other augmentations
+datagen = ImageDataGenerator(
+    rotation_range=30,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+#fit the generator on data
+datagen.fit(X_train)
 
 #  %% load a base model
 
@@ -76,7 +92,8 @@ model = keras.Model(inputs, outputs)
 model.compile(optimizer=keras.optimizers.Adam(),
               loss=keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=[keras.metrics.BinaryAccuracy()])
-model.fit(X_train, y_train, epochs=6)
+model.fit(datagen.flow(X_train, y_train, batch_size=32),
+          epochs=6)
 
 # %% model fine tuning
 
