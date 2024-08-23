@@ -24,6 +24,12 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import visualkeras
 
+# %% definitions
+
+n_epochs_train    = 20
+n_epochs_finetune = 20
+image_shape       = (225, 300) #full size is (450, 600)
+
 # %% load data
 
 with open('data/processed/isic_data.pkl', 'rb') as f:
@@ -38,8 +44,10 @@ metadata           = loaded_data[5]
 
 # %% smart re-sample images
 
-X_train = smart_resize(X_train,(150, 150))
-X_test  = smart_resize(X_test,(150, 150))
+
+
+X_train = smart_resize(X_train,image_shape)
+X_test  = smart_resize(X_test, image_shape)
 
 plot_images_grid_nometa(X_train)
 
@@ -67,7 +75,7 @@ datagen.fit(X_train)
 
 base_model = Xception(
     weights='imagenet',  # Load weights pre-trained on ImageNet.
-    input_shape=(150, 150, 3),
+    input_shape=(image_shape[0], image_shape[1], 3),
     include_top=False)  # Do not include the ImageNet classifier at the top.
 
 # %% freeze
@@ -76,13 +84,11 @@ base_model.trainable = False
 
 # %% 
 
-inputs = keras.Input(shape=(150, 150, 3))
-# We make sure that the base_model is running in inference mode here,
-# by passing `training=False`. This is important for fine-tuning, as you will
-# learn in a few paragraphs.
-x = base_model(inputs, training=False)
-# Convert features of shape `base_model.output_shape[1:]` to vectors
-x = keras.layers.GlobalAveragePooling2D()(x)
+inputs = keras.Input(shape=(image_shape[0], image_shape[1], 3))
+
+x = base_model(inputs, training=False) #leave the base model as is
+x = keras.layers.GlobalAveragePooling2D()(x) #convert features of shape `base_model.output_shape[1:]` to vectors
+
 # A Dense classifier with a single unit (binary classification)
 outputs = keras.layers.Dense(1)(x)
 model = keras.Model(inputs, outputs)
@@ -93,7 +99,7 @@ model.compile(optimizer=keras.optimizers.Adam(),
               loss=keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=[keras.metrics.BinaryAccuracy()])
 model.fit(datagen.flow(X_train, y_train, batch_size=32),
-          epochs=6)
+          epochs=n_epochs_train)
 
 # %% model fine tuning
 
@@ -109,7 +115,7 @@ model.compile(optimizer=keras.optimizers.Adam(1e-5),  # Very low learning rate
 
 # Train end-to-end. Be careful to stop before you overfit!
 model.fit(datagen.flow(X_train, y_train, batch_size=32),
-          epochs=2)
+          epochs=n_epochs_finetune)
 
 
 # %% make predictions
@@ -150,3 +156,8 @@ plt.ylabel('True Positive Rate')
 plt.title('ROC Curves for Each Class')
 plt.legend(loc='lower right')
 plt.show()
+
+# %% save model so that we don't have to run it again
+
+model_name = 'Xception_binary_classifier'
+model.save('./models/' + model_name + '.keras', overwrite=False)
