@@ -26,6 +26,7 @@ import visualkeras
 
 # %% definitions
 
+model_name = 'Xception_binary_classifier' #how do we save the model when it's done
 n_epochs_train    = 20
 n_epochs_finetune = 20
 image_shape       = (225, 300) #full size is (450, 600)
@@ -159,5 +160,4 @@ plt.show()
 
 # %% save model so that we don't have to run it again
 
-model_name = 'Xception_binary_classifier'
 model.save('./models/' + model_name + '.keras', overwrite=False)
