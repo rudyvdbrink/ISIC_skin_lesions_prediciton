@@ -9,14 +9,30 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_curve, 
 
 from sklearn import metrics
 import tensorflow as tf
+import keras
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
 from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.preprocessing.image import smart_resize
+from tensorflow.keras.applications import Xception
+
+from supporting_functions import plot_images_grid_nometa
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import visualkeras
+
+# %% definitions
+
+model_name = 'Xception_multi-class_classifier' #how do we save the model when it's done
+n_epochs_train    = 10
+n_epochs_finetune = 4
+#image_shape       = (71, 71) #full size is (450, 600)
+#image_shape       = (225, 300) #full size is (450, 600)
+image_shape       = (150, 200) #full size is (450, 600)
+
 
 # %% load data
 
@@ -30,26 +46,20 @@ y_test             = loaded_data[3]
 labels             = loaded_data[4]
 metadata           = loaded_data[5]
 
-#%% reshape input data
 
-#reshape X_train to the appropriate 4D shape (9376, 450, 600, 3)
-# X_train = X_train.reshape((9376, 450, 600, 3))
-# X_test  = X_test.reshape((2344, 450, 600, 3))
+# %%
 
-# %% sub-sample
+# 5. Compute class weights to handle the class imbalance
+class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+class_weights_dict = dict(enumerate(class_weights))
 
-# X_train = X_train[:,::3,::3,:]
-# X_test  = X_test[:,::3,::3,:]
 
 # %% smart re-sample images
 
-# X_train = smart_resize(X_train,(28, 28))
-# X_test  = smart_resize(X_test,(28, 28))
+X_train = smart_resize(X_train,image_shape)
+X_test  = smart_resize(X_test, image_shape)
 
-X_train = smart_resize(X_train,(56, 56))
-X_test  = smart_resize(X_test,(56, 56))
-
-#plot_images_grid_nometa(X_train)
+plot_images_grid_nometa(X_train)
 
 # %%
 
@@ -57,35 +67,7 @@ X_test  = smart_resize(X_test,(56, 56))
 num_classes = len(np.unique(y_train))
 y_train_encoded = to_categorical(y_train, num_classes)
 
-
-# %% set up model
-
-model = tf.keras.Sequential([
-    tf.keras.Input(shape=(np.shape(X_train)[1], np.shape(X_train)[2], np.shape(X_train)[3])),
-    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
-    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-    tf.keras.layers.Flatten(), #turn output of previous layer into a vector rather than tensor
-    tf.keras.layers.Dense(units=20,activation='relu'),
-    tf.keras.layers.Dense(units=num_classes, activation='softmax')
-])
-
-# %% info on model
-
-
-model.summary()
-
-#font = ImageFont.truetype("arial.ttf", 32) 
-visualkeras.layered_view(model,legend=True, scale_xy=1, scale_z=0.01)
-
-
-# %% image augmentation (we over-sampled )
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+# %% image augmentation (we over-sampled minority class)
 
 # Create an ImageDataGenerator with random rotations and other augmentations
 datagen = ImageDataGenerator(
@@ -99,51 +81,64 @@ datagen = ImageDataGenerator(
 #fit the generator on data
 datagen.fit(X_train)
 
-# %% compile and fit
+#  %% load a base model
 
-#model.compile(optimizer='sgd',loss='categorical_crossentropy',metrics=['accuracy'])
-model.compile(optimizer='Adam',loss='categorical_crossentropy')
+base_model = Xception(
+    weights='imagenet',  # Load weights pre-trained on ImageNet.
+    input_shape=(image_shape[0], image_shape[1], 3),
+    include_top=False)  # Do not include the ImageNet classifier at the top.
 
-# Train the model using the generator
-model.fit(datagen.flow(X_train, to_categorical(y_train, num_classes=num_classes), batch_size=32),
-          steps_per_epoch=len(X_train) // 32,
-          epochs=20,
-          )
-model.summary()
+# %% freeze
 
-# %%
+base_model.trainable = False
+
+# %% 
+
+inputs = keras.Input(shape=(image_shape[0], image_shape[1], 3))
+
+x = base_model(inputs, training=False) #leave the base model as is
+x = keras.layers.GlobalAveragePooling2D()(x) #convert features of shape `base_model.output_shape[1:]` to vectors
+
+# A Dense classifier with as many units as there are classes (multi-class classification)
+outputs = keras.layers.Dense(num_classes)(x)
+model = keras.Model(inputs, outputs)
+
+# %% train the model
+
+model.compile(optimizer=keras.optimizers.Adam(),
+              loss=keras.losses.CategoricalCrossentropy(from_logits=True),
+              metrics=[keras.metrics.BinaryAccuracy()])
+model.fit(datagen.flow(X_train, y_train_encoded, batch_size=32),
+          epochs=n_epochs_train,
+          class_weight=class_weights_dict)
+
+# %% model fine tuning
+
+# Unfreeze the base model
+base_model.trainable = True
+
+# It's important to recompile your model after you make any changes
+# to the `trainable` attribute of any inner layer, so that your changes
+# are take into account
+model.compile(optimizer=keras.optimizers.Adam(1e-5),  # Very low learning rate
+              loss=keras.losses.CategoricalCrossentropy(from_logits=True),
+              metrics=[keras.metrics.BinaryAccuracy()])
+
+# Train end-to-end. Be careful to stop before you overfit!
+model.fit(datagen.flow(X_train, y_train_encoded, batch_size=32),
+          epochs=n_epochs_finetune,
+           class_weight=class_weights_dict)
 
 
-# pred = model.predict(X_test)
-# pred = np.argmax(pred,axis=1)
-# print('Accuracy = ' + str(np.mean(pred==y_test)))
-# print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
+# %% make predictions
 
-# #plt.imshow(metrics.confusion_matrix(y_test,pred))
-# sns.heatmap(metrics.confusion_matrix(y_test,pred) / len(pred),linecolor='white',linewidths=0.05)
-# plt.xlabel("true label")
-# plt.ylabel("predicted label")
-# plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,pred)))
-# plt.show()
-
-
-# %%
-
-# 1. Evaluate the model on the test data
-num_classes = len(np.unique(y_test))
-# test_loss, test_accuracy = model.evaluate(X_test, to_categorical(y_test, num_classes), verbose=0)
-# print(f'Test Loss: {test_loss:.4f}')
-# print(f'Test Accuracy: {test_accuracy:.4f}')
-
-# 2. Predict the class probabilities and class labels
 y_pred_proba = model.predict(X_test)
+#y_pred_proba = np.concatenate((y_pred_proba*-1, y_pred_proba), axis=1)
 y_pred       = np.argmax(y_pred_proba, axis=1)
 
-# %% classification report
+# %% classification report and plots
 
 print(classification_report(y_pred,y_test,zero_division=0))
-
-# %% plots
 
 print('Accuracy = ' + str(np.mean(y_pred==y_test)))
 print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
@@ -151,7 +146,7 @@ print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred
 # 3. Plot the confusion matrix
 conf_matrix = confusion_matrix(y_test, y_pred,normalize='true')
 plt.figure(figsize=(5, 4))
-sns.heatmap(conf_matrix, annot=True, cmap="inferno", xticklabels=labels, yticklabels=labels)
+sns.heatmap(conf_matrix, annot=True, cmap="inferno", vmin=0, vmax=1, xticklabels=labels, yticklabels=labels)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
 plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_test,y_pred)))
@@ -173,3 +168,7 @@ plt.ylabel('True Positive Rate')
 plt.title('ROC Curves for Each Class')
 plt.legend(loc='lower right')
 plt.show()
+
+# %% save model so that we don't have to run it again
+
+model.save('./models/' + model_name + '.keras', overwrite=False)

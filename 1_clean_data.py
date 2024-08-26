@@ -41,22 +41,25 @@ target = pd.factorize(target)[0]
 X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.20, random_state=1234)
 
 
-# %% rebalance data (super-sample less frequent class)
+# %% rebalance data (super-sample less frequent classes)
 
-# # Flatten the input data temporarily to use with RandomOverSampler
-# X_train_flat = X_train.reshape((X_train.shape[0], -1))  # Reshape to (9376, 90000)
+# Flatten the input data temporarily to use with RandomOverSampler
+X_train_flat = X_train.reshape((X_train.shape[0], -1))  # Reshape to (9376, 90000)
 
 
-# # Apply RandomOverSampler to balance the classes
-# ros = RandomOverSampler(sampling_strategy='auto', random_state=42)
-# X_train_resampled, y_train_resampled = ros.fit_resample(X_train_flat, y_train)
+# Apply RandomOverSampler to balance the classes
+ros = RandomOverSampler(sampling_strategy='auto', random_state=42)
+X_train_resampled, y_train_resampled = ros.fit_resample(X_train_flat, y_train)
 
-# # Reshape X_train back to the original shape
-# X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2], 3))
+# Reshape X_train back to the original shape
+X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2], 3))
 
-# # Verify the class distribution after resampling
-# unique, counts = np.unique(y_train_resampled, return_counts=True)
-# print(f'Class distribution after resampling: {dict(zip(unique, counts))}')
+# Verify the class distribution after resampling
+unique, counts = np.unique(y_train_resampled, return_counts=True)
+print(f'Class distribution after resampling: {dict(zip(unique, counts))}')
+
+X_train = X_train_resampled
+y_train = y_train_resampled
 
 # # %% sub-sample data to its original size
 
