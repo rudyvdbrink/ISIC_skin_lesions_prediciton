@@ -170,3 +170,5 @@ to_do.txt
 *.pkl
 notes.txt
 .vscode
+*.keras
+scrap.py
