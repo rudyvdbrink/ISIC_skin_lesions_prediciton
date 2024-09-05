@@ -171,4 +171,5 @@ to_do.txt
 notes.txt
 .vscode
 *.keras
-scrap.py
+scrap*
+scrap/

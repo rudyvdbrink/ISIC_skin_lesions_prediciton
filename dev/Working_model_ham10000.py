@@ -18,7 +18,7 @@ from tensorflow.keras.applications import VGG16
 from tensorflow.keras.preprocessing.image import smart_resize
 from tensorflow.keras.applications import Xception
 
-#from supporting_functions import plot_images_grid_nometa
+from supporting_functions import plot_images_grid_nometa
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -26,7 +26,7 @@ import visualkeras
 
 # %% definitions
 
-model_name = 'Xception_multi-class_classifier' #how do we save the model when it's done
+model_name = 'Xception_multi-class_classifier_back2skool' #how do we save the model when it's done
 n_epochs_train    = 10
 n_epochs_finetune = 4
 #image_shape       = (71, 71) #full size is (450, 600)
@@ -59,7 +59,7 @@ class_weights_dict = dict(enumerate(class_weights))
 X_train = smart_resize(X_train,image_shape)
 X_test  = smart_resize(X_test, image_shape)
 
-#plot_images_grid_nometa(X_train)
+plot_images_grid_nometa(X_train)
 
 # %%
 

@@ -13,31 +13,72 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_curve, 
 
 # %% data loading
 
-def load_dataset(data_dir):
+def retrieve_labels(ds):
+    #get target from the dataset
+    y = np.concatenate([y for _, y in ds], axis=0)
+    return np.argmax(y, axis=1)
+
+def retrieve_data(ds):
+    #get data from the dataset
+    x = np.concatenate([x for x, _ in ds], axis=0).astype('uint8')
+    return x
+
+def load_dataset(data_dir,full_set=0):
 
     #parameters
     batch_size        = 256 #large batch size because we have a very imbalanced dataset
-    img_width         = 600 #original image shape
-    img_height        = 450 #original image shape
+    img_width         = 150 #original image shape
+    img_height        = 200 #original image shape
     rn_seed           = 42 #what random number seed to use
 
-    #get .jpg data
-    train_ds, test_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        data_dir,
-        validation_split=0.2,
-        labels='inferred',
-        label_mode='categorical',
-        subset="both",
-        seed=rn_seed,
-        image_size=(img_width, img_height),
-        batch_size=batch_size,
-        shuffle=True
-    )
-
-    return train_ds, test_ds
-
+    if full_set == 0:
+        #get .jpg data
+        train_ds, test_ds = tf.keras.preprocessing.image_dataset_from_directory(
+            data_dir,
+            validation_split=0.2,
+            labels='inferred',
+            label_mode='categorical',
+            subset="both",
+            seed=rn_seed,
+            image_size=(img_width, img_height),
+            batch_size=batch_size,
+            shuffle=True
+        )
+        return train_ds, test_ds
+    else:
+        #get .jpg data
+        ds = tf.keras.preprocessing.image_dataset_from_directory(
+            data_dir,
+            labels='inferred',
+            label_mode='categorical',
+            seed=rn_seed,
+            image_size=(img_width, img_height),
+            batch_size=batch_size,
+            shuffle=True
+        )
+        return ds
 
 # %% ploting
+
+def plot_images_grid_nometa(images_array,start_N=0, num_images=12, grid_shape=(3, 4)):
+    # Create a figure with a specified size
+    fig, axes = plt.subplots(grid_shape[0], grid_shape[1], figsize=(15, 10))
+    
+    # Flatten the axes array for easy iteration
+    axes = axes.flatten()
+    
+    for i in range(num_images):
+        if i < len(images_array):
+            # Plot each image
+            axes[i].imshow(images_array[i+start_N])
+            axes[i].axis('off')  # Hide the axis
+
+    # Remove any unused subplots
+    for j in range(num_images, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout()
+    plt.show()
 
 def evaluation_plots(model, ds):
 
@@ -91,3 +132,4 @@ def evaluation_plots(model, ds):
 
     plt.tight_layout()
     plt.show()
+

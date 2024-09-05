@@ -7,8 +7,11 @@ print('Now copying over data...')
 
 # %% definitions
 
-raw_dir       = './data/raw/HAM10000/'
-processed_dir = './data/processed/HAM10000/'
+#raw_dir       = './data/raw/HAM10000/'
+#processed_dir = './data/processed/HAM10000/'
+
+raw_dir       = './data/raw/2019_challenge/'
+processed_dir = './data/processed/2019_challenge/'
 
 # %% get metadata 
 
