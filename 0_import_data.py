@@ -1,93 +1,40 @@
 # %% libraries
 import os
+import shutil
 import pandas as pd
-import numpy as np
-from PIL import Image
-from supporting_functions import plot_images_grid
-import pickle
 
-# %% read images
-def load_images(raw_images_dir):
-    # List to store the images as numpy arrays
-    images = []
-    file_names = []
+print('Now copying over data...')
 
-    print('Now loading data...')
+# %% definitions
 
-    # Iterate over the files in the folder
-    for filename in os.listdir(raw_images_dir):
-        if filename.endswith('.jpg'):  # Check if the file is a .jpg image
-            # Load the image
-            img_path = os.path.join(raw_images_dir, filename)
-            img = Image.open(img_path)
-            
-            # Convert image to numpy array
-            img_array = np.array(img)
-            
-            # Add the image array to the list
-            images.append(img_array)
-            file_names.append(filename)
+#raw_dir       = './data/raw/HAM10000/'
+#processed_dir = './data/processed/HAM10000/'
 
-    # Convert list of images to a single 3D numpy array
-    images = np.array(images)
-    print('Data loaded successfully')
+raw_dir       = './data/raw/2019_challenge/'
+processed_dir = './data/processed/2019_challenge/'
 
-    return images, file_names
+# %% get metadata 
 
-# %% function to load metadata
+metadata = pd.read_csv(raw_dir + '/metadata.csv')
 
+# %% re-organize images
 
-def load_and_sort_metadata(csv_path, file_names):
-    # Load the metadata from the .csv file
-    metadata = pd.read_csv(csv_path + 'ham10000_metadata_2024-08-17.csv')
+#create target directory if it doesn't exist yet
+os.makedirs(processed_dir, exist_ok=True)
 
-    # Get the list of image file names (without the .jpg suffix)
-    image_filenames = [filename.split('.')[0] for filename in file_names if filename.endswith('.jpg')]
+#iterate through the dataframe and organize the images
+for index, row in metadata.iterrows():
+    label_dir = os.path.join(processed_dir, row.diagnosis) #target directory for the current file
+    filename = row.isic_id + '.jpg' #name of the current file
 
-    # Ensure the metadata is sorted according to the image filenames order
-    metadata_sorted = metadata.set_index('isic_id').loc[image_filenames].reset_index()
+    #create a subdirectory for the label if it doesn't exist yet
+    os.makedirs(label_dir, exist_ok=True)   
+    
+    #define full source and target file paths
+    src_file = os.path.join(raw_dir,   filename)
+    dst_file = os.path.join(label_dir, filename)
+    
+    #copy the file
+    shutil.copy(src_file, dst_file)
 
-    return metadata_sorted
-
-if __name__ == '__main__':
-    # %% folder defintions
-
-    raw_images_dir  = './data/raw/'
-    metadata_dir    = './data/metadata/'
-
-
-    # %% perform tasks
-
-    # load the images
-    data, file_names = load_images(raw_images_dir)
-
-    #print(data.shape)  # Prints the shape of the numpy array
-
-    # %% load meta data
-
-    # Example usage
-    metadata = load_and_sort_metadata(metadata_dir, file_names)
-
-    # Display the first few rows of the sorted metadata
-    #print(metadata.head())
-
-
-    # %% scale to max = 1
-
-    #data = data / 255
-
-    # %% plot some images to make sure it went correctly
-
-    #plot_images_grid(data,metadata,start_N=0)
-    #plot_images_grid(data,start_N=0,num_images=4,grid_shape=(2,2))
-
-    # %% save data to file
-
-    data_to_save = [data, metadata, file_names]
-
-    # save data to file so we don't have to run it again
-    with open('data/imported/isic_data.pkl','wb') as f:
-        pickle.dump(data_to_save,f) 
-
-
-    print('All done!')
+print('All done!')

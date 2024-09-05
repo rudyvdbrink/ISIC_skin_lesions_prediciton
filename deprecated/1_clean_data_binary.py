@@ -6,16 +6,55 @@ import pickle
 
 from sklearn.model_selection import train_test_split
 
-from supporting_functions import plot_images_grid_nometa
+from supporting_functions import plot_images_grid
 
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.utils import resample
 
-from tensorflow.keras.datasets import mnist
 
-# %% load mnist data
+# %% load data
 
-(X_train, y_train), (X_test, y_test) = mnist.load_data() 
+with open('data/imported/isic_data.pkl', 'rb') as f:
+    loaded_data = pickle.load(f)
+
+data     = loaded_data[0]
+metadata = loaded_data[1]
+
+# %% keep copy of metadata
+
+metadata_full = metadata.copy()
+
+# %% drop information we cannot use, and split off the target
+
+columns_to_keep = ['age_approx', 'anatom_site_general',  'sex', 'diagnosis']
+metadata = metadata[columns_to_keep]
+target = metadata.pop('diagnosis')
+
+# %% label encode the target
+
+labels = dict(enumerate(pd.factorize(target)[1]))
+target = pd.factorize(target)[0]
+
+# %% group target into only two classes to make the problem a binary classifiation
+
+# {0: 'nevus',
+#  1: 'melanoma',
+#  2: 'pigmented benign keratosis',
+#  3: 'dermatofibroma',
+#  4: 'squamous cell carcinoma',
+#  5: 'basal cell carcinoma',
+#  6: 'vascular lesion',
+#  7: 'actinic keratosis'}
+# 0: [0, 2, 3, 6] # Benign
+# 1: [1, 4, 5, 7] # (Pre-)Cancerous
+
+target = np.where(np.isin(target, [0, 2, 3, 6]), 0, 1)
+labels = ['Benign', '(Pre-)Cancerous']
+
+
+# %% train test split
+
+X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.20, random_state=1234)
 
 
 # %% rebalance data (super-sample less frequent class)
@@ -29,7 +68,7 @@ ros = RandomOverSampler(sampling_strategy='auto', random_state=42)
 X_train_resampled, y_train_resampled = ros.fit_resample(X_train_flat, y_train)
 
 # Reshape X_train back to the original shape
-X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2]))
+X_train_resampled = X_train_resampled.reshape((-1, X_train.shape[1], X_train.shape[2], 3))
 
 # Verify the class distribution after resampling
 unique, counts = np.unique(y_train_resampled, return_counts=True)
@@ -41,7 +80,7 @@ print(f'Class distribution after resampling: {dict(zip(unique, counts))}')
 X_train_subsampled, y_train_subsampled = resample(
     X_train_resampled, y_train_resampled, 
     replace=False,  # Do not replace, we want exactly original size
-    n_samples=X_train.shape[0],  # Original size
+    n_samples=9376,  # Original size
     random_state=42  # For reproducibility
 )
 
@@ -57,11 +96,11 @@ y_train = y_train_subsampled
 
 # %% save data
 
-data_to_save = [X_train, X_test, y_train, y_test]
+data_to_save = [X_train, X_test, y_train, y_test, labels, metadata]
 
 print('Saving data...')
 # save data to file so we don't have to run it again
-with open('../data/processed/mnist_data.pkl','wb') as f:
+with open('data/processed/isic_data.pkl','wb') as f:
     pickle.dump(data_to_save,f) 
 print('All done!')
 
@@ -69,5 +108,5 @@ print('All done!')
 
 #%%
 
-plot_images_grid_nometa(X_train,start_N=0)
+plot_images_grid(X_train,metadata_full,start_N=0)
 
