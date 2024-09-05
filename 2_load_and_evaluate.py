@@ -16,7 +16,7 @@ data_dir   = './data/processed/HAM10000/' # where did we store the images
 
 # %% load data
 
-ds = make_full_dataset_from_image_directory(data_dir,batch_size=32,shuffle=False)
+ds = make_full_dataset_from_image_directory(data_dir,batch_size=32,shuffle=True)
 
 # %% load model
 
