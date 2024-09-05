@@ -26,9 +26,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from loading_functions import make_balanced_dataset_from_image_directory
 
+# %% Notes
+
+#This code trains successfully 
+
 # %% definitions
 
-model_name = 'Xception_multi-class_classifier_back3skool' #how do we save the model when it's done
+model_name = 'Xception_multi-class_classifier_3' #how do we save the model when it's done
 n_epochs_train    = 5
 n_epochs_finetune = 2
 #image_shape       = (71, 71) #full size is (450, 600)

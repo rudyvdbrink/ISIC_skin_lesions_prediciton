@@ -24,9 +24,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import visualkeras
 
+# %% Notes
+
+#This code trains successfully 
+
 # %% definitions
 
-model_name = 'Xception_multi-class_classifier_back2skool' #how do we save the model when it's done
+model_name = 'Xception_multi-class_classifier_2' #how do we save the model when it's done
 n_epochs_train    = 10
 n_epochs_finetune = 4
 #image_shape       = (71, 71) #full size is (450, 600)

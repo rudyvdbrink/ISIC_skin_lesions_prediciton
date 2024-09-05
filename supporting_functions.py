@@ -11,7 +11,7 @@ from tensorflow.keras.utils import to_categorical
 
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 
-# %% data loading
+# %% data / labels retrieval
 
 def retrieve_labels(ds):
     #get target from the dataset
@@ -22,41 +22,6 @@ def retrieve_data(ds):
     #get data from the dataset
     x = np.concatenate([x for x, _ in ds], axis=0).astype('uint8')
     return x
-
-def load_dataset(data_dir,full_set=0):
-
-    #parameters
-    batch_size        = 256 #large batch size because we have a very imbalanced dataset
-    img_width         = 150 #original image shape
-    img_height        = 200 #original image shape
-    rn_seed           = 42 #what random number seed to use
-
-    if full_set == 0:
-        #get .jpg data
-        train_ds, test_ds = tf.keras.preprocessing.image_dataset_from_directory(
-            data_dir,
-            validation_split=0.2,
-            labels='inferred',
-            label_mode='categorical',
-            subset="both",
-            seed=rn_seed,
-            image_size=(img_width, img_height),
-            batch_size=batch_size,
-            shuffle=True
-        )
-        return train_ds, test_ds
-    else:
-        #get .jpg data
-        ds = tf.keras.preprocessing.image_dataset_from_directory(
-            data_dir,
-            labels='inferred',
-            label_mode='categorical',
-            seed=rn_seed,
-            image_size=(img_width, img_height),
-            batch_size=batch_size,
-            shuffle=True
-        )
-        return ds
 
 # %% ploting
 

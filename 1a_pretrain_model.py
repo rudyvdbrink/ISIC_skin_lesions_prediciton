@@ -5,7 +5,6 @@ import time
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 
 from sklearn import metrics
 import tensorflow as tf
@@ -14,17 +13,14 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.utils import to_categorical
 from sklearn.utils.class_weight import compute_class_weight
-from tensorflow.keras.applications import VGG16
 from tensorflow.keras.preprocessing.image import smart_resize
 from tensorflow.keras.applications import Xception
 
-from supporting_functions import plot_images_grid_nometa
-from supporting_functions import evaluation_plots, load_dataset, retrieve_data, retrieve_labels
-
+#from supporting_functions import plot_images_grid_nometa
+from supporting_functions import evaluation_plots, retrieve_data, retrieve_labels
+from loading_functions import make_balanced_dataset_from_image_directory
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
-from loading_functions import make_balanced_dataset_from_image_directory
 
 # %% definitions
 
@@ -32,7 +28,6 @@ model_name = 'Xception_multi-class_classifier_pretrained' #how do we save the mo
 n_epochs_train    = 10
 n_epochs_finetune = 5
 image_shape       = (150, 200) #full size is (450, 600)
-
 
 # %% load data
 
@@ -42,26 +37,18 @@ n_epochs_train    = 10
 batch_size        = 32
 target_size       = 6200
 
-ds = make_balanced_dataset_from_image_directory(data_dir, 
+train_ds = make_balanced_dataset_from_image_directory(data_dir, 
                                                  batch_size=batch_size, 
                                                  target_size=target_size,
                                                  shuffle=False)
 
-X = retrieve_data(ds)
-X = X.astype('uint8')
-y = retrieve_labels(ds)
-
-X_train = X
-y_train = y
+X_train = retrieve_data(train_ds)
+y_train = retrieve_labels(train_ds)
 
 # %% compute class weights to handle the class imbalance
 
 class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
 class_weights_dict = dict(enumerate(class_weights))
-
-# %% plot images
-
-#plot_images_grid_nometa(X_train)
 
 # %% #one-hot encode the labels
 
@@ -104,7 +91,7 @@ x = keras.layers.GlobalAveragePooling2D()(x) #convert features of shape `base_mo
 outputs = keras.layers.Dense(num_classes)(x)
 model = keras.Model(inputs, outputs)
 
-# %% train the model
+# %% train the model (only the added layer)
 
 model.compile(optimizer=keras.optimizers.Adam(),
               loss=keras.losses.CategoricalCrossentropy(from_logits=True),
@@ -113,7 +100,7 @@ model.fit(datagen.flow(X_train, y_train_encoded, batch_size=32),
           epochs=n_epochs_train,
           class_weight=class_weights_dict)
 
-# %% model fine tuning
+# %% model fine tuning (end-to-end training)
 
 #unfreeze the base model
 base_model.trainable = True
@@ -128,63 +115,24 @@ model.fit(datagen.flow(X_train, y_train_encoded, batch_size=32),
           epochs=n_epochs_finetune,
            class_weight=class_weights_dict)
 
-
-# %% make predictions
-
-y_pred_proba = model.predict(X_train)
-y_pred       = np.argmax(y_pred_proba, axis=1)
-
-# %% classification report and plots
-labels = ['AK', 'BCC', 'DF', 'MLN', 'NV', 'PBK', 'SCC', 'VL']
-
-print(classification_report(y_pred,y_train,zero_division=0))
-
-print('Accuracy = ' + str(np.mean(y_pred==y_train)))
-print('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_train,y_pred)))
-
-# 3. Plot the confusion matrix
-conf_matrix = confusion_matrix(y_train, y_pred,normalize='true')
-plt.figure(figsize=(5, 4))
-sns.heatmap(conf_matrix, annot=True, cmap="inferno", vmin=0, vmax=1, xticklabels=labels, yticklabels=labels)
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-plt.title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y_train,y_pred)))
-plt.show()
-
-# 4. Plot the ROC curves for each class
-plt.figure(figsize=(5, 4))
-
-for i, label in enumerate(labels):
-    fpr, tpr, _ = roc_curve(to_categorical(y_train, num_classes)[:, i], y_pred_proba[:, i])
-    roc_auc = auc(fpr, tpr)
-    plt.plot(fpr, tpr, lw=2, label=f'ROC curve for {label} (area = {roc_auc:.2f})')
-
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')  # Diagonal line
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('ROC Curves for Each Class')
-plt.legend(loc='lower right')
-plt.show()
-
-# %% save model so that we don't have to run it again
+# %% save model so that we can run it again
 
 model.save('./models/' + model_name + '.keras', overwrite=False)
 
-# %%
+# %% evalulate (training data)
+
+evaluation_plots(model, train_ds)
+
+# %% load testing data
 
 data_dir          = './data/processed/HAM10000/' # where did we store the images
-batch_size        = 32
 target_size       = 1000
 
-ds = make_balanced_dataset_from_image_directory(data_dir, 
+test_ds = make_balanced_dataset_from_image_directory(data_dir, 
                                                  batch_size=batch_size, 
                                                  target_size=target_size,
                                                  shuffle=False)
 
-
 # %% evalulate (testing data)
-from supporting_functions import evaluation_plots, load_dataset
 
-evaluation_plots(model, ds)
+evaluation_plots(model, test_ds)

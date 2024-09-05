@@ -20,10 +20,9 @@ def load_and_preprocess_image(file_path):
     return image
 
 #function for making a dataset out of one directory
-def make_dataset_from_image_sub_directory(sub_dir, label, batch_size):
+def make_dataset_from_image_sub_directory(sub_dir, label):
 
     files = glob.glob(sub_dir + '/*.jpg') #list of image file paths
-    #labels = np.zeros(len(files)) + label #corresponding labels (same for each file)
     
     labels = np.zeros( (len(files), 8)) #one-hot encoded labels
     labels[:,label] = 1
@@ -37,11 +36,6 @@ def make_dataset_from_image_sub_directory(sub_dir, label, batch_size):
 
     #combine images and labels into a single dataset 
     ds = tf.data.Dataset.zip((image_ds, labels_ds))
-
-    #shuffle, batch, and prefetch the dataset as needed
-    #ds = ds.shuffle(buffer_size=len(files), seed=42)
-    ds = ds.batch(batch_size=batch_size)
-    ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     return ds
 
