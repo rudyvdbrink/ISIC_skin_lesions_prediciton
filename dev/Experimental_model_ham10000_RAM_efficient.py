@@ -35,12 +35,12 @@ data_dir          = './data/processed/2019_challenge/' # where did we store the 
 target_shape      = (150, 200) #image shape after re-sizing
 n_epochs_train    = 10
 batch_size        = 32
-target_size       = 100
+target_size       = 6200
 
 train_ds = make_balanced_dataset_from_image_directory(data_dir, 
                                                  batch_size=batch_size, 
                                                  target_size=target_size,
-                                                 shuffle=False)
+                                                 shuffle=True)
 
 #X_train = retrieve_data(train_ds)
 y_train = retrieve_labels(train_ds)
@@ -101,7 +101,7 @@ model = keras.Model(inputs, outputs)
 model.compile(optimizer=keras.optimizers.Adam(),
               loss=keras.losses.CategoricalCrossentropy(from_logits=True),
               metrics=[keras.metrics.BinaryAccuracy()])
-model.fit(datagen.flow(X, y, batch_size=32),
+model.fit(datagen.flow(np.array(X), y, batch_size=32),
           epochs=n_epochs_train,
           class_weight=class_weights_dict)
 
@@ -116,7 +116,7 @@ model.compile(optimizer=keras.optimizers.Adam(1e-5),  # very low learning rate
               metrics=[keras.metrics.BinaryAccuracy()])
 
 #train end-to-end
-model.fit(datagen.flow(X, y, batch_size=32),
+model.fit(datagen.flow(np.array(X), y, batch_size=32),
           epochs=n_epochs_finetune,
            class_weight=class_weights_dict)
 
