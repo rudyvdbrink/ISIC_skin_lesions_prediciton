@@ -15,7 +15,7 @@ from tensorflow.keras.utils import to_categorical
 # %% definitions
 
 load_model_name = 'Xception_multi-class_classifier_pretrained' #what model to load
-save_model_name = 'Xception_multi-class_classifier_fully_trained2' #how to save the model afterwards
+save_model_name = 'Xception_multi-class_classifier_fully_trained' #how to save the model afterwards
 
 base_dir       = './data/processed/HAM10000/'
 batch_size     = 32
@@ -27,7 +27,7 @@ n_epochs_train = 5
 
 # %% get data
 
-train_ds, test_ds, val_ds = make_balanced_split_dataset_from_image_directory(base_dir, 
+train_ds, val_ds, test_ds = make_balanced_split_dataset_from_image_directory(base_dir, 
                                                                             batch_size, 
                                                                             target_size, 
                                                                             split=split, 
