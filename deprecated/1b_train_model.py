@@ -14,17 +14,16 @@ from tensorflow.keras.utils import to_categorical
 
 # %% definitions
 
-load_model_name = 'Xception_multi-class_classifier_pretrained_aggregate' #what model to load
-#save_model_name = 'Xception_multi-class_classifier_fully_trained_aggregate_2rounds' #how to save the model afterwards
+load_model_name = 'Xception_multi-class_classifier_pretrained' #what model to load
+save_model_name = 'Xception_multi-class_classifier_fully_trained_3rounds2' #how to save the model afterwards
 
 base_dir       = './data/processed/HAM10000/'
 batch_size     = 32
+target_size    = 6200
 validation     = True
 shuffle        = True
 split          = [0.7, 0.1, 0.2] #train, validation, test split proportions
-target_size    = [6200, 6200, 6200, 6200, None, 6200, 6200, 6200]
-n_epochs_train = 2
-
+n_epochs_train = 3
 
 # %% get data
 
@@ -76,15 +75,9 @@ datagen = ImageDataGenerator(
 )
 #fit the generator on data
 datagen.fit(X_train)
-#datagen.fit(X)
 
 # %% train end-to-end
 
-# model.fit( datagen.flow(X_train, y_train_encoded, batch_size=batch_size),
-#            epochs=n_epochs_train,
-#            class_weight=class_weights_dict,
-#            validation_data=val_ds
-#            )
 model.fit( datagen.flow(np.array(X_train), y, batch_size=batch_size),
            epochs=n_epochs_train,
            class_weight=class_weights_dict,

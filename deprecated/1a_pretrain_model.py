@@ -24,18 +24,18 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # %% definitions
 
-model_name = 'Xception_multi-class_classifier_pretrained_aggregate' #how do we save the model when it's done
+model_name = 'Xception_multi-class_classifier_pretrained' #how do we save the model when it's done
 n_epochs_train    = 10
 n_epochs_finetune = 5
 image_shape       = (150, 200) #full size is (450, 600)
 
 # %% load data
 
-data_dir          = './data/processed/Aggregate/' # where did we store the images
+data_dir          = './data/processed/2019_challenge/' # where did we store the images
 target_shape      = (150, 200) #image shape after re-sizing
 n_epochs_train    = 10
 batch_size        = 32
-target_size       = [6200, 6200, 6200, 6200, None, 6200, 6200, 6200]
+target_size       = 6200
 
 train_ds = make_balanced_dataset_from_image_directory(data_dir, 
                                                  batch_size=batch_size, 
@@ -126,7 +126,7 @@ evaluation_plots(model, train_ds)
 # %% load testing data
 
 data_dir          = './data/processed/HAM10000/' # where did we store the images
-target_size       = None
+target_size       = 1000
 
 test_ds = make_balanced_dataset_from_image_directory(data_dir, 
                                                  batch_size=batch_size, 
