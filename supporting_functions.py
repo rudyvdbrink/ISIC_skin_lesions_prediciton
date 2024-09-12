@@ -2,8 +2,10 @@
 import tensorflow as tf
 import keras
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 import seaborn as sns
+from PIL import Image
 
 from sklearn import metrics
 
@@ -98,3 +100,110 @@ def evaluation_plots(model, ds):
     plt.tight_layout()
     plt.show()
 
+def prediction_barplot(counts):
+
+    #define classes manually    
+    #class_names = ['AK', 'BCC', 'DF', 'MLN', 'NV', 'PBK', 'SCC', 'VL']
+    class_names = ['actinic keratosis', 
+                   'basal cell carcinoma', 
+                   'dermatofibroma',
+                   'melanoma', 
+                   'nevus',
+                   'pigmented benign keratosis',
+                   'squamous cell carcinoma',
+                   'vascular lesion']
+
+    #sort classes by probability
+    sorted_indices     = np.argsort(counts)[::-1]  # Sort in descending order
+    sorted_counts      = counts.transpose()[sorted_indices]
+    sorted_class_names = [class_names[i] for i in sorted_indices]    
+
+    classes_in_red = ['actinic keratosis', 'basal cell carcinoma', 'melanoma', 'squamous cell carcinoma']
+    #classes_in_red = ['AK', 'BCC', 'MLN', 'SCC']
+
+    #create a list of colors based on whether the class should be highlighted in red
+    colors = ['lightcoral' if cls in classes_in_red else 'skyblue' for cls in sorted_class_names]
+
+    #plot class probability
+    fig = plt.figure(figsize=(6, 3))
+    plt.bar(np.arange(len(class_names)), sorted_counts, color=colors)
+    plt.xlabel('Class label')
+    plt.ylabel('Probability (%)')
+    plt.title('Predicted probability')
+    plt.xticks(np.arange(len(class_names)))  # Show class labels on the x-axis
+
+    #format plot
+    ax = plt.gca()
+    ax.set_xticklabels(sorted_class_names,ha='right')
+    plt.xticks(rotation=45)   
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    red_patch = mpatches.Patch(color='lightcoral', label='Requires treatment')
+    blue_patch = mpatches.Patch(color='skyblue', label='Does not require treatment')
+    plt.legend(handles=[red_patch, blue_patch])
+
+    fig.patch.set_alpha(0.0)  #transparent background for the figure
+    ax.patch.set_alpha(0.0)   #transparent background for the axes
+
+    return fig
+
+# %% model input / output handeling
+
+#Preprocess the image to match the model input requirements
+def preprocess_image(img, target_size):
+
+    #resize the image to the model's expected input shape
+    img = img.resize((target_size[1], target_size[0]))
+
+    #convert the image to a numpy array
+    img = np.array(img, dtype=np.float32)
+
+    #add a batch dimension since the model expects a batch of inputs
+    img = np.expand_dims(img, axis=0)
+       
+    return img
+    
+#Compute percentage probabilities from raw model output
+def rescale_to_probability(logits):
+
+    #apply softmax function to raw scores (logits)
+    percs = tf.nn.softmax(logits) 
+
+    #convert to percentage
+    percs *= 100
+
+    return  percs.numpy()[0]
+
+
+# %% TFlite model prediction
+
+def make_tfl_prediction(model_name,img):
+
+    #load the TFLite model and allocate tensors
+    try:
+        interpreter = tf.lite.Interpreter(model_path="../models/" + model_name)
+    except:
+        interpreter = tf.lite.Interpreter(model_path="./models/" + model_name)
+
+    interpreter.allocate_tensors()
+
+    #get input and output tensor details
+    input_details  = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    #preprocess the input image
+    #image_path = "./example_imgs/0001_nevus.png"
+
+    input_shape = input_details[0]['shape'][1:3]  # Get input shape (height, width)
+    preprocessed_image = preprocess_image(img, input_shape)
+
+    #set the model input
+    interpreter.set_tensor(input_details[0]['index'], preprocessed_image)
+
+    #run inference
+    interpreter.invoke()
+
+    #get the output
+    output_data = interpreter.get_tensor(output_details[0]['index'])
+
+    return output_data
