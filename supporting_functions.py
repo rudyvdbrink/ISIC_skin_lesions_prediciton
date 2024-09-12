@@ -152,6 +152,10 @@ def prediction_barplot(counts):
 #Preprocess the image to match the model input requirements
 def preprocess_image(img, target_size):
 
+    if img.mode != 'RGB':
+        #convert the image to RGB if needed
+        img = img.convert('RGB')
+
     #resize the image to the model's expected input shape
     img = img.resize((target_size[1], target_size[0]))
 
