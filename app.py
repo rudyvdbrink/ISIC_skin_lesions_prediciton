@@ -25,7 +25,7 @@ st.sidebar.page_link(page="pages/about.py", label="About")
 #model_name = 'Xception_multi-class_classifier_fully_trained_3rounds_quantized.tflite'
 model_name = 'Xception_fair.tflite'
 
-# %%
+# %% functions and other definitions
 
 #function to select a random image from the './example_img' folder
 def pick_random_image(folder_path):
@@ -35,6 +35,14 @@ def pick_random_image(folder_path):
     else:
         return None
 
+class_names = ['actinic keratosis', 
+                   'basal cell carcinoma', 
+                   'dermatofibroma',
+                   'melanoma', 
+                   'nevus',
+                   'pigmented benign keratosis',
+                   'squamous cell carcinoma',
+                   'vascular lesion']
 
 # %% main functionality
 
@@ -48,7 +56,8 @@ if st.button("Pick one for me"):
     random_image_path = pick_random_image('./example_imgs')
     if random_image_path:
         img = Image.open(random_image_path)
-        st.image(img, caption='Randomly Selected Image', use_column_width=True)
+        true_class = random_image_path.split('_')[-1].split('.')[0]
+        st.image(img, caption='Randomly Selected Image. True class: ' + true_class, use_column_width=True)
     else:
         st.write("No images found in the example_imgs folder.")
 
@@ -67,9 +76,15 @@ if 'img' in locals():
     probabilities = rescale_to_probability(output_data)
 
     predicted_class = np.argmax(output_data)
-    confidence = probabilities[predicted_class]
+    confidence = np.round(probabilities[predicted_class])
+    label = class_names[predicted_class]
 
-    st.write(f"Predicted class: {predicted_class}, Confidence: {confidence}")
+    # st.write(f"Predicted class: {label}.")
+    # st.write(f"Confidence: {confidence} %")
+
+    st.markdown(f"**Predicted class: {label}.**")
+    st.markdown(f"**Confidence: {confidence} %**")
+
 
     # Generate and display the prediction barplot
     fig = prediction_barplot(probabilities)
