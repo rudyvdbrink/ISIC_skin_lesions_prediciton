@@ -13,17 +13,39 @@ sys.path.append(parent_dir)
 
 from supporting_functions import preprocess_image, rescale_to_probability, make_tfl_prediction, prediction_barplot
 
-# %% page navigation
+# %% config
+st.set_page_config(layout="wide")
+# Layout with two columns
+spacer1, left_col, right_col, spacer2 = st.columns([1, 3, 3, 1])
+
+# %% Side bar
 
 #create a sidebar with options for navigation
 st.sidebar.title('Navigation')
 st.sidebar.page_link(page="app.py", label="Home")
 st.sidebar.page_link(page="pages/about.py", label="About")
 
+#play audio in the sidebar
+st.sidebar.title('Audio summary')
+audio_file = open('.streamlit/audio_summary.wav', 'rb')
+audio_bytes = audio_file.read()
+st.sidebar.audio(audio_bytes, format='audio/wav')
+st.sidebar.write("Made with notebookLM")
+
+#drop-down menu to select a model
+st.sidebar.title('Model selection')
+model_name = st.sidebar.selectbox(
+    "Select a model",   # Label for the dropdown
+    ('InceptionResNet', 'Xception')  # Options for the dropdown
+)
+
 # %% model definition
 
 #model_name = 'Xception_multi-class_classifier_fully_trained_3rounds_quantized.tflite'
-model_name = 'Xception_fair.tflite'
+if model_name == 'Xception':
+    model_name = 'Xception_fair.tflite'
+elif model_name == 'InceptionResNet':
+    model_name = 'InceptionResNetV2_fair.tflite'
 
 # %% functions and other definitions
 
@@ -46,49 +68,51 @@ class_names = ['actinic keratosis',
 
 # %% main functionality
 
-st.title("Skin lesion prediciton") #title 
+with left_col:
+    st.title("File upload") #title 
 
-# Drag and drop box for image upload
-uploaded_file = st.file_uploader("Drag and drop an image here", type=["png", "jpg", "jpeg"])
+    # Drag and drop box for image upload
+    uploaded_file = st.file_uploader("Drag and drop an image here", type=["png", "jpg", "jpeg"])
+    st.write("or")
+    # "Pick one for me" button
+    if st.button("Pick one for me"):
+        random_image_path = pick_random_image('./example_imgs')
+        if random_image_path:
+            img = Image.open(random_image_path)
+            true_class = random_image_path.split('_')[-1].split('.')[0]
+            st.image(img, caption='Randomly Selected Image. True class: ' + true_class, use_column_width=True)
+        else:
+            st.write("No images found in the example_imgs folder.")
 
-# "Pick one for me" button
-if st.button("Pick one for me"):
-    random_image_path = pick_random_image('./example_imgs')
-    if random_image_path:
-        img = Image.open(random_image_path)
-        true_class = random_image_path.split('_')[-1].split('.')[0]
-        st.image(img, caption='Randomly Selected Image. True class: ' + true_class, use_column_width=True)
-    else:
-        st.write("No images found in the example_imgs folder.")
+    # If an image has been uploaded
+    elif uploaded_file is not None:
+        # Open the image using PIL
+        img = Image.open(uploaded_file)
 
-# If an image has been uploaded
-elif uploaded_file is not None:
-    # Open the image using PIL
-    img = Image.open(uploaded_file)
+        # Display the uploaded image
+        st.image(img, caption='Uploaded Image', use_column_width=True)
 
-    # Display the uploaded image
-    st.image(img, caption='Uploaded Image', use_column_width=True)
+with right_col:
+    # Proceed with prediction if an image (either uploaded or randomly picked) is available
+    if 'img' in locals():
+        # Model prediction on the image
+        output_data = make_tfl_prediction(model_name, img)
+        probabilities = rescale_to_probability(output_data)
 
-# Proceed with prediction if an image (either uploaded or randomly picked) is available
-if 'img' in locals():
-    # Model prediction on the image
-    output_data = make_tfl_prediction(model_name, img)
-    probabilities = rescale_to_probability(output_data)
+        predicted_class = np.argmax(output_data)
+        confidence = np.round(probabilities[predicted_class])
+        label = class_names[predicted_class]
 
-    predicted_class = np.argmax(output_data)
-    confidence = np.round(probabilities[predicted_class])
-    label = class_names[predicted_class]
-
-    # st.write(f"Predicted class: {label}.")
-    # st.write(f"Confidence: {confidence} %")
-
-    st.markdown(f"**Predicted class: {label}.**")
-    st.markdown(f"**Confidence: {confidence} %**")
+        # st.write(f"Predicted class: {label}.")
+        # st.write(f"Confidence: {confidence} %")
+        st.title("Prediction")
+        st.markdown(f"**Predicted class: {label}.**")
+        st.markdown(f"**Confidence: {confidence} %**")
 
 
-    # Generate and display the prediction barplot
-    fig = prediction_barplot(probabilities)
-    st.pyplot(fig)
+        # Generate and display the prediction barplot
+        fig = prediction_barplot(probabilities)
+        st.pyplot(fig)
 
 
 

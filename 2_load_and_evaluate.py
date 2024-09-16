@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 #model_name = 'Xception_multi-class_classifier_pretrained' #what model to evaluate
 model_name = 'Xception_multi-class_classifier_fully_trained_aggregate' #what model to evaluate
+#model_name = 'InceptionResNetV2_multi-class_classifier_fully_trained' #what model to evaluate
 
 data_dir   = './data/processed/HAM10000/' # where did we store the images
 #data_dir   = './data/processed/2019_challenge/' # where did we store the images

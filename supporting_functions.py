@@ -81,7 +81,7 @@ def evaluation_plots(model, ds):
                 xticklabels=labels, yticklabels=labels, ax=axes[0])
     axes[0].set_xlabel('Predicted Label')
     axes[0].set_ylabel('True Label')
-    axes[0].set_title('Balanced accuracy = ' + str(metrics.balanced_accuracy_score(y,y_pred)))
+    axes[0].set_title('Balanced accuracy = ' + str(np.round(metrics.balanced_accuracy_score(y,y_pred)*100)) + '%')
 
     #plot the ROC curves for each class
     for i, label in enumerate(labels):
@@ -98,6 +98,8 @@ def evaluation_plots(model, ds):
     axes[1].legend(loc='lower right')
 
     plt.tight_layout()
+    plt.savefig('./figures/model_performance.png', transparent=True)
+
     plt.show()
 
 def prediction_barplot(counts):
