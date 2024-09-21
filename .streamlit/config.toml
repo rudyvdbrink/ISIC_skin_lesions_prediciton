@@ -1,0 +1,10 @@
+[theme]
+base="light"
+primaryColor="#4285F4"       # Google’s signature blue
+backgroundColor="#FFFFFF"    # Clean white background for simplicity and openness
+secondaryBackgroundColor="#F1F3F4"  # Very light gray for subtle contrast
+textColor="#202124"          # Dark gray for clean and readable text
+font="monospace"
+
+[client]
+showSidebarNavigation = false
