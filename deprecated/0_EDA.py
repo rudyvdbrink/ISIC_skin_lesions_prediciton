@@ -9,7 +9,8 @@ from collections import Counter
 # %% definitions
 
 #set_name = 'HAM10000'
-set_name = '2019_challenge'
+#set_name = '2019_challenge'
+set_name = 'Aggregate'
 
 raw_dir       = './data/raw/' + set_name + '/'
 processed_dir = './data/processed/' + set_name + '/'

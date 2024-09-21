@@ -19,6 +19,25 @@ probabilities  = rescale_to_probability(output_data)
 
 prediction_barplot(probabilities)
 
+# %%
+
+# from supporting_functions import rescale_to_probability
+
+# probabilities = make_tfl_prediction(model_name, img)
+# probabilities = rescale_to_probability(probabilities)
+
+# predictions = []
+# for i in range(len(class_names)):
+#     predictions.append({
+#         'class': class_names[i],
+#         'probability': float(probabilities[i])
+#     })
+
+# predictions = sorted(predictions, key=lambda x: x['probability'], reverse=True)
+
+# jsonify({
+#     'predictions': predictions
+# })
 
 # %%
 

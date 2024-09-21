@@ -20,8 +20,8 @@ st.sidebar.page_link(page="pages/about.py", label="About")
 st.sidebar.title('Audio summary')
 audio_file = open('.streamlit/audio_summary.wav', 'rb')
 audio_bytes = audio_file.read()
-st.sidebar.audio(audio_bytes, format='audio/wav')
 st.sidebar.write("Made with notebookLM")
+st.sidebar.audio(audio_bytes, format='audio/wav')
 
 #drop-down menu to select a model
 st.sidebar.title('Model selection')
@@ -29,6 +29,8 @@ model_name = st.sidebar.selectbox(
     "Select a model",   # Label for the dropdown
     ('InceptionResNet', 'Xception')  # Options for the dropdown
 )
+
+
 
 # %% Layout with two columns
 left_col, right_col = st.columns(2)
@@ -56,7 +58,7 @@ with left_col:
     [ISIC 2019 challenge](https://api.isic-archive.com/collections/65/), [description](https://challenge.isic-archive.com/landing/2019/)\
 
 
-    [HAM10000](https://api.isic-archive.com/collections/212/), [publication](https://www.nature.com/articles/sdata2018161#MOESM246)
+    [HAM10000](https://api.isic-archive.com/collections/212/), [publication](https://www.nature.com/articles/sdata2018161)
 
     ### Diagnosis categories
 

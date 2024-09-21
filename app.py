@@ -29,8 +29,8 @@ st.sidebar.page_link(page="pages/about.py", label="About")
 st.sidebar.title('Audio summary')
 audio_file = open('.streamlit/audio_summary.wav', 'rb')
 audio_bytes = audio_file.read()
-st.sidebar.audio(audio_bytes, format='audio/wav')
 st.sidebar.write("Made with notebookLM")
+st.sidebar.audio(audio_bytes, format='audio/wav')
 
 #drop-down menu to select a model
 st.sidebar.title('Model selection')

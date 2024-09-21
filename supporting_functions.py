@@ -198,9 +198,9 @@ def make_tfl_prediction(model_name,img):
     output_details = interpreter.get_output_details()
 
     #preprocess the input image
-    #image_path = "./example_imgs/0001_nevus.png"
+    #image_path = "./example_imgs/0001_nevus.png" #an image to try the code
 
-    input_shape = input_details[0]['shape'][1:3]  # Get input shape (height, width)
+    input_shape = input_details[0]['shape'][1:3]  #get input shape (height, width)
     preprocessed_image = preprocess_image(img, input_shape)
 
     #set the model input

@@ -1,23 +1,10 @@
 [theme]
-primaryColor = "#1E90FF"  # Dodger Blue, for a calming and professional tone
-secondaryColor = "#FFFFFF"  # White, for a clean and minimalist look
-accentColor = "#00BFFF"  # Deep Sky Blue, to highlight important elements
-backgroundColor = "#F8F9FA"  # Light Gray, a neutral, soft background
-backgroundAltColor = "#E6F7FF"  # Very Light Blue, for sections that need contrast without being too stark
-cardBackgroundColor = "#F2F4F7"  # Soft off-white, for card backgrounds
-textColor = "#333333"  # Dark Gray, for high contrast and readability
-secondaryTextColor = "#555555"  # Medium Gray, for less prominent text (like footnotes)
-borderColor = "#D1D5DB"  # Light Gray, for borders and dividers
-buttonColor = "#00CED1"  # Dark Turquoise, for call-to-action buttons
-buttonHoverColor = "#009EA0"  # A darker turquoise for hover effects on buttons
-linkColor = "#4682B4"  # Steel Blue, for links and hover effects
-linkHoverColor = "#1C6EA4"  # A darker shade for hover effects on links
-footerBackgroundColor = "#E0E0E0"  # Light Gray for the footer, keeping it subtle
-navbarBackgroundColor = "#FFFFFF"  # White, to keep the header clean and simple
-hoverBackgroundColor = "#F0F8FF"  # Light blue-gray, for hover states on menu items or interactive elements
-errorColor = "#FF6347"  # Tomato, for error messages or alerts
-successColor = "#32CD32"  # Lime Green, for success messages or confirmation alerts
-warningColor = "#FFA500"  # Orange, for warning or caution messages
+base="light"
+primaryColor="#4285F4"       # Google’s signature blue
+backgroundColor="#FFFFFF"    # Clean white background for simplicity and openness
+secondaryBackgroundColor="#F1F3F4"  # Very light gray for subtle contrast
+textColor="#202124"          # Dark gray for clean and readable text
+font="monospace"
 
 [client]
 showSidebarNavigation = false
