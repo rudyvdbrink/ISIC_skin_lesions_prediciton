@@ -41,7 +41,7 @@ st.sidebar.audio(audio_bytes, format='audio/wav')
 
 #links out
 st.sidebar.title('Resources')
-st.sidebar.page_link(page="https://github.com/rudyvdbrink", label="Code")
+st.sidebar.page_link(page="https://github.com/rudyvdbrink/ISIC_skin_lesions_prediciton", label="Code")
 st.sidebar.page_link(page="https://ruudvandenbrink.net/", label="About author")
 
 
