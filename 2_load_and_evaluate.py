@@ -23,12 +23,8 @@ from sklearn.metrics import recall_score
 model_name = 'InceptionResNetV2_multi-class_classifier_fully_trained' #what model to evaluate
 
 data_dir   = './data/processed/HAM10000/' # where did we store the images
-#data_dir   = './data/processed/2019_challenge/' # where did we store the images
-
 
 # %% load data
-
-#ds = make_full_dataset_from_image_directory(data_dir,batch_size=32,shuffle=True)
 
 batch_size     = 32
 validation     = True
@@ -46,15 +42,16 @@ train_ds, _, test_ds = make_balanced_split_dataset_from_image_directory(data_dir
 
 model = keras.saving.load_model("./models/" + model_name + ".keras")
 
-# %%
+# %% show training performance
 
 evaluation_plots(model, train_ds)
 
-# %% make evaluation plots
+# %% show testing performance
 
 evaluation_plots(model, test_ds)
 
-# %%
+# %% retrieve data and labels for error analysis
+
 x = retrieve_data(test_ds)
 y = retrieve_labels(test_ds)
 pred = model.predict(test_ds)
@@ -176,7 +173,6 @@ right_pred_mln = np.logical_and(nv_ind,  y_pred == 4)
 row_plot( x[wrong_pred_mln] )
 row_plot( x[right_pred_nv] )
 
-
 # %% compute confidence
 
 from supporting_functions import rescale_to_probability
@@ -233,7 +229,6 @@ sorted_indices = np.argsort(recall_per_class)
 sorted_indices = sorted_indices[::-1]
 
 # Create labels for the classes
-#class_labels = [f'Class {i}' for i in range(len(recall_per_class))]
 class_labels = ['Actinic keratosis', 
                 'Basal cell carcinoma', 
                 'Dermatofibroma',
