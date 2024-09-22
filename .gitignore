@@ -166,7 +166,6 @@ data/
 
 #misc
 to_do.txt
-*.svg
 *.pkl
 notes.txt
 .vscode
