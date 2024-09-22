@@ -16,7 +16,7 @@ from supporting_functions import preprocess_image, rescale_to_probability, make_
 # %% config
 st.set_page_config(layout="wide")
 # Layout with two columns
-spacer1, left_col, right_col, spacer2 = st.columns([1, 3, 3, 1])
+spacer1, left_col, spacer2, right_col, spacer3 = st.columns([1, 3, 1, 3, 1])
 
 # %% Side bar
 
@@ -113,6 +113,8 @@ with right_col:
         # Generate and display the prediction barplot
         fig = prediction_barplot(probabilities)
         st.pyplot(fig)
+        st.markdown(f"**Not a diagnosis. Consult a medical professional.**")
+
 
 
 

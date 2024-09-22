@@ -9,7 +9,7 @@ import matplotlib.patches as mpatches
 from supporting_functions import preprocess_image, rescale_to_probability, make_tfl_prediction, prediction_barplot
 
 # %%
-model_name = 'Xception_multi-class_classifier_fully_trained_3rounds_quantized.tflite'
+model_name = 'InceptionResNetV2_fair.tflite'
 
 image_path = "./example_imgs/0001_nevus.png"
 img = Image.open(image_path)

@@ -1,9 +1,9 @@
 # Skin lesion prediction
-This repository contains code for classification of images into 8 categories of common skin lesion types, using a large convolutional neural network. Code for training the model is included. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people with darker complexions. 
+This repository contains code for classification of images into 8 categories of common skin lesion types, using a large convolutional neural network. Code for training the model is included. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people of color. 
 
 Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
 
-This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. This tool is intended to aid rapid intial screening by medical professionals. Always consult a medical professional.   
+This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. This tool is intended for research purposes only. 
 
 
 ### Data sources
@@ -31,7 +31,7 @@ This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. 
 
 `Vascular lesion (VL)` is an abnormality of the skin or mucous membranes caused by blood vessels, including conditions like hemangiomas and cherry angiomas. Most vascular lesions are benign and often do not require treatment unless for cosmetic purposes or if symptomatic.
 
-### About the model:
+### About the winning model:
 
 Model architecture ([image source](https://www.researchgate.net/figure/Schematic-diagram-compressed-view-of-InceptionResNetv2-model_fig5_348995187)):
 <img title="InceptionResNetV2" src="./figures/InceptionResNetV2_schematic.png">
