@@ -11,6 +11,10 @@ spacer1, left_col, spacer2, right_col, spacer3 = st.columns([1, 3, 1, 3, 1])
 with left_col:
     st.title("Skin lesion prediction")
 
+# %% logo
+
+st.sidebar.image('./figures/logo.svg', width=300)  # Set the desired width in pixels
+
 # %% Side bar
 
 #create a sidebar with options for navigation

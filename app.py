@@ -15,8 +15,14 @@ from supporting_functions import preprocess_image, rescale_to_probability, make_
 
 # %% config
 st.set_page_config(layout="wide")
+
 # Layout with two columns
 spacer1, left_col, spacer2, right_col, spacer3 = st.columns([1, 3, 1, 3, 1])
+
+# %% logo
+
+st.sidebar.image('./figures/logo.svg', width=300)  # Set the desired width in pixels
+
 
 # %% Side bar
 
