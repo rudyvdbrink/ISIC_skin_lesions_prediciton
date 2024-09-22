@@ -52,7 +52,7 @@ with left_col:
 
     ### Aim and scope
 
-    This repository contains code for classification of images into 8 categories of common skin lesion types, using a large convolutional neural network. Code for training the model is included. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people of color. 
+    This app classifies images into 8 categories of common skin lesion types, using a large convolutional neural network. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people of color. 
 
     Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
 
