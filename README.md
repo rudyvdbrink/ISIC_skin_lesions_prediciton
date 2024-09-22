@@ -5,6 +5,11 @@ Note that no model is bias-free, as some bias will be inherent to the data on wh
 
 This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. This tool is intended for research purposes only. 
 
+### Web app
+
+A web app to apply the model is available here:
+
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Launch_App-brightgreen?style=for-the-badge&logo=streamlit)](https://skin-lesion-prediction.streamlit.app/)
 
 ### Data sources
 
