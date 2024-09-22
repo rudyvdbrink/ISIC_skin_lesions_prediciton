@@ -25,6 +25,13 @@ st.sidebar.title('Navigation')
 st.sidebar.page_link(page="app.py", label="Home")
 st.sidebar.page_link(page="pages/about.py", label="About")
 
+#drop-down menu to select a model
+st.sidebar.title('Model selection')
+model_name = st.sidebar.selectbox(
+    "Select a model",   # Label for the dropdown
+    ('InceptionResNet', 'Xception')  # Options for the dropdown
+)
+
 #play audio in the sidebar
 st.sidebar.title('Audio summary')
 audio_file = open('.streamlit/audio_summary.wav', 'rb')
@@ -32,12 +39,11 @@ audio_bytes = audio_file.read()
 st.sidebar.write("Made with notebookLM")
 st.sidebar.audio(audio_bytes, format='audio/wav')
 
-#drop-down menu to select a model
-st.sidebar.title('Model selection')
-model_name = st.sidebar.selectbox(
-    "Select a model",   # Label for the dropdown
-    ('InceptionResNet', 'Xception')  # Options for the dropdown
-)
+#links out
+st.sidebar.title('Resources')
+st.sidebar.page_link(page="https://github.com/rudyvdbrink", label="Code")
+st.sidebar.page_link(page="https://ruudvandenbrink.net/", label="About author")
+
 
 # %% model definition
 

@@ -3,25 +3,20 @@
 import streamlit as st
 from PIL import Image
 
-# %%
-
+# %% Layout with two columns
+#left_col, right_col = st.columns(2)
 st.set_page_config(layout="wide")
+spacer1, left_col, spacer2, right_col, spacer3 = st.columns([1, 3, 1, 3, 1])
 
-st.title("Skin lesion prediction")
+with left_col:
+    st.title("Skin lesion prediction")
 
-# %% page navigation
-# Create a sidebar with options for navigation
+# %% Side bar
+
+#create a sidebar with options for navigation
 st.sidebar.title('Navigation')
-
 st.sidebar.page_link(page="app.py", label="Home")
 st.sidebar.page_link(page="pages/about.py", label="About")
-
-# Play audio in the sidebar
-st.sidebar.title('Audio summary')
-audio_file = open('.streamlit/audio_summary.wav', 'rb')
-audio_bytes = audio_file.read()
-st.sidebar.write("Made with notebookLM")
-st.sidebar.audio(audio_bytes, format='audio/wav')
 
 #drop-down menu to select a model
 st.sidebar.title('Model selection')
@@ -30,10 +25,20 @@ model_name = st.sidebar.selectbox(
     ('InceptionResNet', 'Xception')  # Options for the dropdown
 )
 
+#play audio in the sidebar
+st.sidebar.title('Audio summary')
+audio_file = open('.streamlit/audio_summary.wav', 'rb')
+audio_bytes = audio_file.read()
+st.sidebar.write("Made with notebookLM")
+st.sidebar.audio(audio_bytes, format='audio/wav')
+
+#links out
+st.sidebar.title('Resources')
+st.sidebar.page_link(page="https://github.com/rudyvdbrink/ISIC_skin_lesions_prediciton", label="Code")
+st.sidebar.page_link(page="https://ruudvandenbrink.net/", label="About author")
 
 
-# %% Layout with two columns
-left_col, right_col = st.columns(2)
+
 
 # %% content
 
