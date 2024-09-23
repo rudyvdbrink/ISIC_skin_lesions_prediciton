@@ -13,7 +13,7 @@ with left_col:
 
 # %% logo
 
-st.sidebar.image('./figures/logo.svg', width=300)  # Set the desired width in pixels
+st.sidebar.image('./figures/logo.png', width=250)  # Set the desired width in pixels
 
 # %% Side bar
 
