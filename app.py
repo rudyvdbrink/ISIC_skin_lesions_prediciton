@@ -35,7 +35,7 @@ st.sidebar.page_link(page="pages/about.py", label="About")
 st.sidebar.title('Model selection')
 model_name = st.sidebar.selectbox(
     "Select a model",   # Label for the dropdown
-    ('InceptionResNet', 'Xception')  # Options for the dropdown
+    ('InceptionResNet', 'Xception', 'VGG19')  # Options for the dropdown
 )
 
 #play audio in the sidebar
@@ -58,6 +58,9 @@ if model_name == 'Xception':
     model_name = 'Xception_fair.tflite'
 elif model_name == 'InceptionResNet':
     model_name = 'InceptionResNetV2_fair.tflite'
+elif model_name == 'VGG19':
+    model_name = 'VGG19_fair.tflite'
+
 
 # %% functions and other definitions
 
@@ -69,14 +72,14 @@ def pick_random_image(folder_path):
     else:
         return None
 
-class_names = ['actinic keratosis', 
-                   'basal cell carcinoma', 
-                   'dermatofibroma',
-                   'melanoma', 
-                   'nevus',
-                   'pigmented benign keratosis',
-                   'squamous cell carcinoma',
-                   'vascular lesion']
+class_names = [ 'actinic keratosis', 
+                'basal cell carcinoma', 
+                'dermatofibroma',
+                'melanoma', 
+                'nevus',
+                'pigmented benign keratosis',
+                'squamous cell carcinoma',
+                'vascular lesion']
 
 # %% main functionality
 
@@ -115,41 +118,11 @@ with right_col:
         confidence = np.round(probabilities[predicted_class])
         label = class_names[predicted_class]
 
-        # st.write(f"Predicted class: {label}.")
-        # st.write(f"Confidence: {confidence} %")
         st.title("Prediction")
         st.markdown(f"**Predicted class: {label}.**")
         st.markdown(f"**Confidence: {confidence} %**")
-
 
         # Generate and display the prediction barplot
         fig = prediction_barplot(probabilities)
         st.pyplot(fig)
         st.markdown(f"**Not a diagnosis. Consult a medical professional.**")
-
-
-
-
-# # Drag and drop box for image upload
-# uploaded_file = st.file_uploader("Drag and drop an image here", type=["png", "jpg", "jpeg"])
-
-# # Check if an image has been uploaded
-# if uploaded_file is not None:
-#     #open the image using PIL
-#     img = Image.open(uploaded_file)
-    
-#     #display the image
-#     st.image(img, caption='Uploaded Image', use_column_width=True)
-
-#     # %% model prediction on the image
-
-#     output_data    = make_tfl_prediction(model_name, img)
-#     probabilities  = rescale_to_probability(output_data)
-
-#     predicted_class = np.argmax(output_data)
-#     confidence = probabilities[predicted_class]
-
-#     st.write(f"Predicted class: {predicted_class}, Confidence: {confidence}")
-
-#     fig = prediction_barplot(probabilities)
-#     st.pyplot(fig)
