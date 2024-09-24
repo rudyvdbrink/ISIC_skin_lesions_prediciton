@@ -26,7 +26,7 @@ st.sidebar.page_link(page="pages/about.py", label="About")
 st.sidebar.title('Model selection')
 model_name = st.sidebar.selectbox(
     "Select a model",   # Label for the dropdown
-    ('InceptionResNet', 'Xception')  # Options for the dropdown
+    ('InceptionResNet', 'Xception', 'VGG19')  # Options for the dropdown
 )
 
 #play audio in the sidebar
@@ -125,3 +125,20 @@ elif model_name == 'Xception':
         st.markdown("Model performance on test-set:")
         img = Image.open("./figures/Xception_performance.png")
         st.image(img, caption='Model performance', use_column_width=True)
+elif model_name == 'VGG19':
+    with right_col:
+        st.markdown(
+        """    
+        ### About the model
+
+        The VGG19 model is a deep convolutional neural network introduced by the Visual Geometry Group (VGG) at Oxford in 2014. It is an extension of the VGG16 architecture and consists of 19 layers, including 16 convolutional layers followed by 3 fully connected layers. VGG19 uses small 3x3 convolution filters applied repeatedly in deep stacks. 
+        """
+        )
+        st.markdown("Model architecture ([image source](https://www.researchgate.net/figure/Schematic-diagram-of-the-Xception-model_fig3_352247462)):")
+        img = Image.open("./figures/VGG19_schematic.png")
+
+        st.image(img, caption='VGG19 architecture', use_column_width=True)
+
+        st.markdown("Model performance on test-set:")
+        img = Image.open("./figures/VGG19_performance.png")
+        st.image(img, caption='Model performance', use_column_width=True)        

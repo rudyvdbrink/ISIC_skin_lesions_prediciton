@@ -15,8 +15,7 @@ import matplotlib.pyplot as plt
 
 # %% load model
 
-#model_name = 'Xception_multi-class_classifier_pretrained' #what model to evaluate
-model_name = 'Xception_multi-class_classifier_fully_trained_aggregate' #what model to evaluate
+model_name = 'VGG19_multi-class_classifier_fully_trained' #what model to evaluate
 model = keras.saving.load_model("./models/" + model_name + ".keras")
 
 # %% export as .tflite

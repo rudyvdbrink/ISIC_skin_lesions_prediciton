@@ -11,6 +11,8 @@ A web app to apply the model is available here:
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Launch_App-brightgreen?style=for-the-badge&logo=streamlit)](https://skin-lesion-prediction.streamlit.app/)
 
+In the webapp there is the option to try three different models, by selecting them in the sidebar.
+
 ### Data sources
 
 [Stanford Diverse Dermatology images](https://ddi-dataset.github.io/index.html#dataset), [publication](https://www.science.org/doi/full/10.1126/sciadv.abq6147)

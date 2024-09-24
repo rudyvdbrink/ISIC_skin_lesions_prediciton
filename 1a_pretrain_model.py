@@ -14,7 +14,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 from tensorflow.keras.utils import to_categorical
 from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.preprocessing.image import smart_resize
-from tensorflow.keras.applications import Xception
+from tensorflow.keras.applications import VGG19
 
 #from supporting_functions import plot_images_grid_nometa
 from supporting_functions import evaluation_plots, retrieve_data, retrieve_labels
@@ -24,7 +24,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # %% definitions
 
-model_name = 'Xception_multi-class_classifier_pretrained_aggregate' #how do we save the model when it's done
+model_name = 'VGG19_multi-class_classifier_pretrained_aggregate' #how do we save the model when it's done
 n_epochs_train    = 10
 n_epochs_finetune = 5
 image_shape       = (150, 200) #full size is (450, 600)
@@ -33,7 +33,6 @@ image_shape       = (150, 200) #full size is (450, 600)
 
 data_dir          = './data/processed/Aggregate/' # where did we store the images
 target_shape      = (150, 200) #image shape after re-sizing
-n_epochs_train    = 10
 batch_size        = 32
 target_size       = [6200, 6200, 6200, 6200, None, 6200, 6200, 6200]
 
@@ -71,7 +70,7 @@ datagen.fit(X_train)
 
 #  %% load a base model
 
-base_model = Xception(
+base_model = VGG19(
     weights='imagenet',  # Load weights pre-trained on ImageNet.
     input_shape=(image_shape[0], image_shape[1], 3),
     include_top=False)  # Do not include the ImageNet classifier at the top.
