@@ -144,6 +144,9 @@ def prediction_barplot(counts):
     blue_patch = mpatches.Patch(color='skyblue', label='Does not require treatment')
     plt.legend(handles=[red_patch, blue_patch])
 
+    #set the y axis to start at 0 and end at 100
+    plt.ylim([0, 100])
+
     fig.patch.set_alpha(0.0)  #transparent background for the figure
     ax.patch.set_alpha(0.0)   #transparent background for the axes
 

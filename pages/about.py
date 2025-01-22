@@ -3,13 +3,11 @@
 import streamlit as st
 from PIL import Image
 
-# %% Layout with two columns
-#left_col, right_col = st.columns(2)
-st.set_page_config(layout="wide")
-spacer1, left_col, spacer2, right_col, spacer3 = st.columns([1, 3, 1, 3, 1])
+# %% Layout with one column
 
-with left_col:
-    st.title("Skin lesion prediction")
+#set page layout to normal
+st.set_page_config(layout="centered")
+st.title("Skin Lesion Identifier")
 
 # %% logo
 
@@ -22,43 +20,37 @@ st.sidebar.title('Navigation')
 st.sidebar.page_link(page="app.py", label="Home")
 st.sidebar.page_link(page="pages/about.py", label="About")
 
-#drop-down menu to select a model
-st.sidebar.title('Model selection')
-model_name = st.sidebar.selectbox(
-    "Select a model",   # Label for the dropdown
-    ('InceptionResNet', 'Xception', 'VGG19')  # Options for the dropdown
-)
-
-#play audio in the sidebar
-st.sidebar.title('Audio summary')
-audio_file = open('.streamlit/audio_summary.wav', 'rb')
-audio_bytes = audio_file.read()
-st.sidebar.write("Made with notebookLM")
-st.sidebar.audio(audio_bytes, format='audio/wav')
-
 #links out
 st.sidebar.title('Resources')
 st.sidebar.page_link(page="https://github.com/rudyvdbrink/ISIC_skin_lesions_prediciton", label="Code")
 st.sidebar.page_link(page="https://ruudvandenbrink.net/", label="About author")
 
 
-
-
 # %% content
 
 # Left column: General information
-with left_col:
+st.markdown("""
+
+### Aim and scope
+
+This app classifies spots on the skin into 8 categories (some cancerous, some otherwise) using a large convolutional neural network. The aim was to build a model that performs well for everyone, including people of color. 
+
+Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
+
+This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. With that in mind, feel free to try out the app on the home page. You can upload you own images, or simply use one of the example images provided.             
+"""            
+)
+
+
+st.markdown("""
+### Additional information
+
+            """)
+
+with st.expander("About the data"):
     st.markdown("""
-
-    ### Aim and scope
-
-    This app classifies images into 8 categories of common skin lesion types, using a large convolutional neural network. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people of color. 
-
-    Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
-
-    This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. This tool is intended for research purposes only.
-
     ### Data sources
+    The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The following sources were used:
 
     [Stanford Diverse Dermatology images](https://ddi-dataset.github.io/index.html#dataset), [publication](https://www.science.org/doi/full/10.1126/sciadv.abq6147)
 
@@ -67,31 +59,41 @@ with left_col:
 
 
     [HAM10000](https://api.isic-archive.com/collections/212/), [publication](https://www.nature.com/articles/sdata2018161)
+    """
+    )
 
-    ### Diagnosis categories
+with st.expander("Diagnostic categories"):
+    st.markdown("""
+        ### Diagnostic categories
 
-    `Actinic keratosis (AK)` is a rough, scaly patch on the skin caused by years of sun exposure. It is considered precancerous, as it can potentially evolve into squamous cell carcinoma if left untreated.
+        `Actinic keratosis (AK)` is a rough, scaly patch on the skin caused by years of sun exposure. It is considered precancerous, as it can potentially evolve into squamous cell carcinoma if left untreated.
 
-    `Basal cell carcinoma (BCC)` is the most common type of skin cancer, typically caused by long-term sun exposure. It grows slowly and rarely spreads to other parts of the body, but early treatment is recommended to prevent local tissue damage.
+        `Basal cell carcinoma (BCC)` is the most common type of skin cancer, typically caused by long-term sun exposure. It grows slowly and rarely spreads to other parts of the body, but early treatment is recommended to prevent local tissue damage.
 
-    `Dermatofibroma (DF)` is a benign skin growth, usually firm and raised, often resulting from a minor injury like a bug bite. It’s generally harmless and does not require treatment unless it becomes symptomatic or bothersome.
+        `Dermatofibroma (DF)` is a benign skin growth, usually firm and raised, often resulting from a minor injury like a bug bite. It’s generally harmless and does not require treatment unless it becomes symptomatic or bothersome.
 
-    `Melanoma (MLN)` is a highly aggressive form of skin cancer that arises from melanocytes, the cells responsible for skin pigmentation. It has a high potential to spread to other organs, making early detection and treatment critical for a good prognosis.
+        `Melanoma (MLN)` is a highly aggressive form of skin cancer that arises from melanocytes, the cells responsible for skin pigmentation. It has a high potential to spread to other organs, making early detection and treatment critical for a good prognosis.
 
-    `Nevus (NV)`, or mole, is a common benign skin lesion caused by clusters of melanocytes. While most nevi are harmless, some may undergo changes that necessitate monitoring for melanoma risk.
+        `Nevus (NV)`, or mole, is a common benign skin lesion caused by clusters of melanocytes. While most nevi are harmless, some may undergo changes that necessitate monitoring for melanoma risk.
 
-    `Pigmented benign keratosis (PBK)`, such as seborrheic keratosis, is a common non-cancerous skin growth that appears as a brown, black, or pale patch. These lesions are typically harmless and do not require treatment unless for cosmetic reasons or irritation.
+        `Pigmented benign keratosis (PBK)`, such as seborrheic keratosis, is a common non-cancerous skin growth that appears as a brown, black, or pale patch. These lesions are typically harmless and do not require treatment unless for cosmetic reasons or irritation.
 
-    `Squamous cell carcinoma (SCC)`, is a type of skin cancer that develops from the squamous cells of the epidermis. It can grow and spread if untreated, but it is generally curable when caught early.
+        `Squamous cell carcinoma (SCC)`, is a type of skin cancer that develops from the squamous cells of the epidermis. It can grow and spread if untreated, but it is generally curable when caught early.
 
-    `Vascular lesion (VL)` is an abnormality of the skin or mucous membranes caused by blood vessels, including conditions like hemangiomas and cherry angiomas. Most vascular lesions are benign and often do not require treatment unless for cosmetic purposes or if symptomatic.
+        `Vascular lesion (VL)` is an abnormality of the skin or mucous membranes caused by blood vessels, including conditions like hemangiomas and cherry angiomas. Most vascular lesions are benign and often do not require treatment unless for cosmetic purposes or if symptomatic.
 
 
-    """)
+        """)
 
-# Right column: Model information
-if model_name == 'InceptionResNet':
-    with right_col:
+with st.expander("Model technical information"):
+    model_name = st.selectbox(
+        "Select a model",   # Label for the dropdown
+        ('InceptionResNet', 'Xception', 'VGG19'))  # Options for the dropdown
+    
+    # Right column: Model information
+    if model_name == 'InceptionResNet':
+        
+        
         st.markdown(
         """    
         ### About the model
@@ -108,8 +110,8 @@ if model_name == 'InceptionResNet':
         st.markdown("Model performance on test-set:")
         img = Image.open("./figures/InceptionResNetV2_performance.png")
         st.image(img, caption='Model performance', use_column_width=True)
-elif model_name == 'Xception':
-    with right_col:        
+    elif model_name == 'Xception':
+               
         st.markdown(
         """    
         ### About the model
@@ -125,8 +127,8 @@ elif model_name == 'Xception':
         st.markdown("Model performance on test-set:")
         img = Image.open("./figures/Xception_performance.png")
         st.image(img, caption='Model performance', use_column_width=True)
-elif model_name == 'VGG19':
-    with right_col:
+    elif model_name == 'VGG19':
+        
         st.markdown(
         """    
         ### About the model
@@ -142,3 +144,14 @@ elif model_name == 'VGG19':
         st.markdown("Model performance on test-set:")
         img = Image.open("./figures/VGG19_performance.png")
         st.image(img, caption='Model performance', use_column_width=True)        
+
+
+# %% audio summary
+
+st.markdown("""
+### Audio summary
+""")
+
+audio_file = open('.streamlit/audio_summary.wav', 'rb')
+audio_bytes = audio_file.read()
+st.audio(audio_bytes, format='audio/wav')
