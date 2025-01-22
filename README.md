@@ -1,19 +1,22 @@
-# Skin lesion prediction
-This repository contains code for classification of images into 8 categories of common skin lesion types, using a large convolutional neural network. Code for training the model is included. The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. The aim was to build a model that is less biased towards accurate diagnosis for light-skinned samples and also performs well for people of color. 
+# Skin Lesion Identifier
+
+<h2 align="center">
+    <img title="Logo" src="./figures/logo_bg.png" width="200">
+</h2>
+
+Skin lesion identifier is an application that classifies images of spots on the skin into 8 categories of common skin lesion types, using a large convolutional neural network. This app was built with the intent to perform well for everyone, including people of color. 
 
 Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
 
-This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. This tool is intended for research purposes only. 
-
-### Web app
-
-A web app to apply the model is available here:
+This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. With that in mind, feel free to try out the app here:
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Launch_App-brightgreen?style=for-the-badge&logo=streamlit)](https://skin-lesion-prediction.streamlit.app/)
 
-In the webapp there is the option to try three different models, by selecting them in the sidebar. Information about the individual models is available in the 'about' page (just change the model in the sidebar to see the different models).
+In the webapp there is the option to try three different models. Information about the individual models is available in the 'about' page (under model technical information).
 
 ### Data sources
+
+The training data consisted of both dermatoscopic and non-dermatoscopic images, and with a range of skin tones. 
 
 [Stanford Diverse Dermatology images](https://ddi-dataset.github.io/index.html#dataset), [publication](https://www.science.org/doi/full/10.1126/sciadv.abq6147)
 \
@@ -40,11 +43,13 @@ In the webapp there is the option to try three different models, by selecting th
 
 ### About the winning model:
 
+Code for training the model is included in this repository. Some information on the winning model and its performance:
+
 Model architecture ([image source](https://www.researchgate.net/figure/Schematic-diagram-compressed-view-of-InceptionResNetv2-model_fig5_348995187)):
-<img title="InceptionResNetV2" src="./figures/InceptionResNetV2_schematic.png">
+<img title="InceptionResNetV2" src="./figures/InceptionResNetV2_schematic_bg.png">
 
 Model performance on test-set:
-<img title="Model Performance" src="./figures/InceptionResNetV2_performance.png">
+<img title="Model Performance" src="./figures/InceptionResNetV2_performance_bg.png">
 
 
 ### **Installation on `macOS`**: 
