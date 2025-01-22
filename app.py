@@ -31,35 +31,10 @@ st.sidebar.title('Navigation')
 st.sidebar.page_link(page="app.py", label="Home")
 st.sidebar.page_link(page="pages/about.py", label="About")
 
-#drop-down menu to select a model
-st.sidebar.title('Model selection')
-model_name = st.sidebar.selectbox(
-    "Select a model",   # Label for the dropdown
-    ('InceptionResNet', 'Xception', 'VGG19')  # Options for the dropdown
-)
-
-#play audio in the sidebar
-st.sidebar.title('Audio summary')
-audio_file = open('.streamlit/audio_summary.wav', 'rb')
-audio_bytes = audio_file.read()
-st.sidebar.write("Made with notebookLM")
-st.sidebar.audio(audio_bytes, format='audio/wav')
-
 #links out
 st.sidebar.title('Resources')
 st.sidebar.page_link(page="https://github.com/rudyvdbrink/ISIC_skin_lesions_prediciton", label="Code")
 st.sidebar.page_link(page="https://ruudvandenbrink.net/", label="About author")
-
-
-# %% model definition
-
-#model_name = 'Xception_multi-class_classifier_fully_trained_3rounds_quantized.tflite'
-if model_name == 'Xception':
-    model_name = 'Xception_fair.tflite'
-elif model_name == 'InceptionResNet':
-    model_name = 'InceptionResNetV2_fair.tflite'
-elif model_name == 'VGG19':
-    model_name = 'VGG19_fair.tflite'
 
 
 # %% functions and other definitions
@@ -84,6 +59,24 @@ class_names = [ 'actinic keratosis',
 # %% main functionality
 
 with left_col:
+
+    # %% model definition
+
+    st.title('Model selection')
+    model_name = st.selectbox(
+        "Select a model",   # Label for the dropdown
+        ('InceptionResNet', 'Xception', 'VGG19')  # Options for the dropdown
+    )
+
+    #model_name = 'Xception_multi-class_classifier_fully_trained_3rounds_quantized.tflite'
+    if model_name == 'Xception':
+        model_name = 'Xception_fair.tflite'
+    elif model_name == 'InceptionResNet':
+        model_name = 'InceptionResNetV2_fair.tflite'
+    elif model_name == 'VGG19':
+        model_name = 'VGG19_fair.tflite'
+
+
     st.title("File upload") #title 
 
     # Drag and drop box for image upload
@@ -125,4 +118,3 @@ with right_col:
         # Generate and display the prediction barplot
         fig = prediction_barplot(probabilities)
         st.pyplot(fig)
-        st.markdown(f"**Not a diagnosis. Consult a medical professional.**")
