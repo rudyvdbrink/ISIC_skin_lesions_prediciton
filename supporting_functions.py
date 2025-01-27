@@ -1,12 +1,14 @@
 # %% libraries
+import os
+import random
 import tensorflow as tf
-import keras
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 import seaborn as sns
-from PIL import Image
-
+import altair as alt
+import pandas as pd
+import streamlit as st
 from sklearn import metrics
 
 from tensorflow.keras.utils import to_categorical
@@ -26,6 +28,14 @@ def retrieve_data(ds):
     return x
 
 # %% ploting
+
+#function to select a random image from the './example_img' folder
+def pick_random_image(folder_path):
+    image_files = [f for f in os.listdir(folder_path) if f.endswith(('png', 'jpg', 'jpeg'))]
+    if image_files:
+        return os.path.join(folder_path, random.choice(image_files))
+    else:
+        return None
 
 def plot_images_grid_nometa(images_array,start_N=0, num_images=12, grid_shape=(3, 4)):
     # Create a figure with a specified size
@@ -152,6 +162,35 @@ def prediction_barplot(counts):
 
     return fig
 
+def draw_st_bar_chart(probabilities, class_names):
+
+    # Capitalize the first letter of every word in the list
+    class_names = [name.title() for name in class_names]
+
+    # Create a list of colors based on whether the class should be highlighted in red
+    classes_in_red = ['Actinic Keratosis', 'Basal Cell Carcinoma', 'Melanoma', 'Squamous Cell Carcinoma']
+    colors = ['Malignant' if cls in classes_in_red else 'Benign' for cls in class_names]
+
+    # Create a pandas DataFrame
+    data = {'Predicted class': class_names, 'Probability (%)': probabilities, 'Color': colors}
+    chart_data = pd.DataFrame(data)
+
+    # Sort the DataFrame by probability in descending order
+    chart_data = chart_data.sort_values(by='Probability (%)', ascending=False)
+
+    # Create an Altair bar chart
+    chart = alt.Chart(chart_data).mark_bar().encode(
+        x=alt.X('Probability (%):Q', scale=alt.Scale(domain=[0, 105])),
+        y=alt.Y('Predicted class:N', sort='-x'),
+        color=alt.Color('Color:N', scale=alt.Scale(domain=['Malignant', 'Benign'], range=['lightcoral', 'skyblue']),
+                        legend=alt.Legend(title="", orient='top', columns=1))  # Use the color information and add legend
+    ).properties(
+        width=600,
+        height=400
+    )
+    
+    st.altair_chart(chart, use_container_width=True)
+    
 # %% model input / output handeling
 
 #Preprocess the image to match the model input requirements
