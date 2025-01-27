@@ -12,7 +12,15 @@ This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. 
 
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Launch_App-brightgreen?style=for-the-badge&logo=streamlit)](https://skin-lesion-prediction.streamlit.app/)
 
-In the webapp there is the option to try three different models. Information about the individual models is available in the 'about' page (under model technical information).
+In the webapp there is the option to try three different models. Information about the individual models is available in the 'about' page (under model technical information). In brief: the InceptionResNet model performs best.
+
+Upload a file and receive a prediction:
+
+<img title="InceptionResNetV2" src="./figures/schematic.png">
+
+If you would like to probe the model for more insight into how it is arriving at its prediciton, you have the option to analyze the image further. This will give you "SHAP" values that can tell you what parts of the image were most important to the model. It can tell you for example if the model is making its determination based on the lesion or on the surrounding tissue.
+
+<img title="InceptionResNetV2" src="./figures/schematic2.png">
 
 ### Data sources
 
