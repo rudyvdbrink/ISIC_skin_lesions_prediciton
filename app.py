@@ -15,6 +15,9 @@ from supporting_functions import (draw_st_bar_chart,
                                   pick_random_image
                                  )
 
+from shap_functions import compute_shap_values, plot_shap_values
+
+
 # %% config
 st.set_page_config(layout="wide")
 
@@ -114,9 +117,6 @@ with left_col:
                 st.image(st.session_state.img, caption='Uploaded Image', use_column_width=True)
 
 
-
-from shap_functions import compute_shap_values, plot_shap_values
-
 with right_col:
     # Proceed with prediction if an image (either uploaded or randomly picked) is available
     if st.session_state.img is not None:
@@ -138,6 +138,28 @@ with right_col:
 
             # Generate and display the prediction barplot
             draw_st_bar_chart(probabilities, class_names)
+
+            with st.popover("What do the labels mean?"):
+                   st.markdown("""
+                               ### Diagnostic categories
+
+                                *Actinic keratosis* is a rough, scaly patch on the skin caused by years of sun exposure. It is considered precancerous, as it can potentially evolve into squamous cell carcinoma if left untreated.
+
+                                *Basal cell carcinoma* is the most common type of skin cancer, typically caused by long-term sun exposure. It grows slowly and rarely spreads to other parts of the body, but early treatment is recommended to prevent local tissue damage.
+
+                                *Dermatofibroma* is a benign skin growth, usually firm and raised, often resulting from a minor injury like a bug bite. It’s generally harmless and does not require treatment unless it becomes symptomatic or bothersome.
+
+                                *Melanoma* is a highly aggressive form of skin cancer that arises from melanocytes, the cells responsible for skin pigmentation. It has a high potential to spread to other organs, making early detection and treatment critical for a good prognosis.
+
+                                *Nevus*, or mole, is a common benign skin lesion caused by clusters of melanocytes. While most nevi are harmless, some may undergo changes that necessitate monitoring for melanoma risk.
+
+                                *Pigmented benign keratosis*, such as seborrheic keratosis, is a common non-cancerous skin growth that appears as a brown, black, or pale patch. These lesions are typically harmless and do not require treatment unless for cosmetic reasons or irritation.
+
+                                *Squamous cell carcinoma*, is a type of skin cancer that develops from the squamous cells of the epidermis. It can grow and spread if untreated, but it is generally curable when caught early.
+
+                                *Vascular lesion* is an abnormality of the skin or mucous membranes caused by blood vessels, including conditions like hemangiomas and cherry angiomas. Most vascular lesions are benign and often do not require treatment unless for cosmetic purposes or if symptomatic.
+
+                                """)
             
         st.title("Detail analysis")
         with st.container(border=True):
