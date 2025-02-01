@@ -37,7 +37,7 @@ This app classifies spots on the skin into 8 categories (some cancerous, some ot
 
 Note that no model is bias-free, as some bias will be inherent to the data on which the model was trained. The current model is only one step in the right direction, and by no means an unbiassed model.
 
-This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. With that in mind, feel free to try out the app on the home page. You can upload you own images, or simply use one of the example images provided.             
+This is not a diagnostic tool. Do not use it to diagnose your own skin lesions. With that in mind, feel free to try out the app on the home page. You can upload your own image, or simply use one of the example images provided.             
 """            
 )
 
